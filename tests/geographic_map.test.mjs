@@ -229,5 +229,109 @@ assert.ok(statusesRepresented.has('Resolved'), 'Demo dataset must include Resolv
 
 console.log(`  ✓ Demonstration dataset verified: 100 reports (0 verified GPS, 92 approximate landmark, 8 unmapped), all unique IDs CT-101..CT-200, all 12 categories, all lifecycle statuses`);
 
+// Test 7: Location Selection Workflow, Marker Movement & Provenance Integrity
+console.log('Group 7: Location Selection Workflow & Coordinate Provenance Integrity');
+
+const {
+  searchNewTownLocations,
+  findNearestLandmark,
+  isWithinNewTownBounds,
+  formatCoordinates,
+} = await import('../src/utils/locationUtils.js');
+
+// 1. User-pinned coordinate selection
+const userPinnedIssue = {
+  id: 'CT-202',
+  title: 'Pothole on pedestrian footpath near CE block market',
+  category: 'Roads and Footpaths',
+  building: 'Action Area I • CB & CE Residential Blocks',
+  location: 'Action Area I • Street 106',
+  coordinates: { lat: 22.58412, lng: 88.45567 },
+  locationPrecision: 'user-pinned',
+  locationSource: 'Pinned on Interactive Map',
+  status: 'Open',
+  priority: 'High',
+};
+const userPinnedCoords = resolveIssueCoordinates(userPinnedIssue);
+assert.ok(userPinnedCoords, 'User-pinned issue must resolve coordinates');
+assert.equal(userPinnedCoords.lat, 22.58412, 'Must preserve exact user-pinned latitude');
+assert.equal(userPinnedCoords.lng, 88.45567, 'Must preserve exact user-pinned longitude');
+assert.equal(userPinnedCoords.isExact, false, 'User-pinned issue must NOT be mislabeled as verified GPS');
+assert.equal(userPinnedCoords.source, 'Pinned on Interactive Map', 'Must preserve truthful user-pinned source');
+
+// 2. Verified GPS from browser geolocation
+const browserGpsIssue = {
+  id: 'CT-203',
+  title: 'Exposed street lighting junction box',
+  category: 'Streetlights and Electricity',
+  building: 'Action Area I • Nazrul Tirtha & Cultural Complex',
+  coordinates: { lat: 22.58350, lng: 88.45500 },
+  locationPrecision: 'verified-gps',
+  locationSource: 'Browser Geolocation (GPS)',
+  status: 'Open',
+  priority: 'High',
+};
+const gpsCoords = resolveIssueCoordinates(browserGpsIssue);
+assert.ok(gpsCoords, 'Browser GPS issue must resolve coordinates');
+assert.equal(gpsCoords.isExact, true, 'Browser GPS issue with verified-gps precision must be marked isExact: true');
+assert.equal(gpsCoords.source, 'Verified GPS Coordinates');
+
+// 3. Marker movement and position refinement
+const refinedIssue = {
+  ...userPinnedIssue,
+  coordinates: { lat: 22.58450, lng: 88.45600 },
+  locationSource: 'Pinned on Interactive Map (Refined via Drag)',
+};
+const refinedCoords = resolveIssueCoordinates(refinedIssue);
+assert.equal(refinedCoords.lat, 22.58450, 'Refined latitude after marker drag must be preserved');
+assert.equal(refinedCoords.lng, 88.45600, 'Refined longitude after marker drag must be preserved');
+
+// 4. Missing coordinates directed to unmapped queue
+const unmappedSelectionIssue = {
+  id: 'CT-204',
+  title: 'Broken bus stop sign in perimeter sector',
+  building: 'Other / Unmapped New Town Location',
+  coordinates: null,
+  locationPrecision: 'unmapped',
+  status: 'Open',
+};
+assert.equal(
+  resolveIssueCoordinates(unmappedSelectionIssue),
+  null,
+  'Unmapped user selection must return null and never fabricate coordinates'
+);
+
+// 5. New Town Landmark Search & Spatial Distance
+const nazrulMatches = searchNewTownLocations('Nazrul');
+assert.ok(nazrulMatches.length > 0, 'Search for Nazrul should return results');
+assert.equal(nazrulMatches[0].name, 'Nazrul Tirtha & Cultural Complex');
+
+const gateMatches = searchNewTownLocations('Biswa Bangla Gate');
+assert.ok(gateMatches.length > 0, 'Search for Biswa Bangla Gate should return results');
+assert.equal(gateMatches[0].name, 'Biswa Bangla Gate (Narkelbagan)');
+
+const nearest = findNearestLandmark(22.58352, 88.45501);
+assert.ok(nearest, 'Should detect nearest landmark');
+assert.equal(nearest.landmark.id, 'nazrul-tirtha');
+assert.ok(nearest.distanceMeters < 30, 'Distance to Nazrul Tirtha should be < 30 meters');
+
+assert.equal(isWithinNewTownBounds(22.5835, 88.4550), true, 'New Town coordinate should be within bounds');
+assert.equal(isWithinNewTownBounds(19.0760, 72.8777), false, 'Mumbai coordinate should be outside New Town bounds');
+assert.equal(formatCoordinates({ lat: 22.5835, lng: 88.4550 }), '22.58350, 88.45500');
+
+// 6. Map popup badge rendering
+const popupPinned = createPopupHtml(userPinnedIssue);
+assert.ok(popupPinned.includes('User-Pinned Location'), 'Popup must display User-Pinned Location badge');
+
+const popupGps = createPopupHtml(browserGpsIssue, true);
+assert.ok(popupGps.includes('Verified GPS'), 'Popup must display Verified GPS badge');
+
+const popupUnmapped = createPopupHtml(unmappedSelectionIssue);
+assert.ok(popupUnmapped.includes('Unmapped Queue'), 'Popup must display Unmapped Queue badge');
+
+console.log('  ✓ User-pinned coordinates preserved without landmark replacement');
+console.log('  ✓ Browser GPS provenance verified without false GPS claims');
+console.log('  ✓ Marker drag refinement, unmapped safety, landmark search, and popup badges verified');
+
 console.log('\n=== ALL GEOGRAPHIC MAP TESTS PASSED ===\n');
 

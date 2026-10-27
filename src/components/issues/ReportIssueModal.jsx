@@ -16,6 +16,7 @@ import {
   CURRENT_SIMULATED_USER,
 } from '../../data/mockIssues';
 import { detectPossibleDuplicates } from '../../utils/duplicateDetection';
+import LocationPicker from './LocationPicker';
 
 export default function ReportIssueModal({
   isOpen,
@@ -36,6 +37,9 @@ export default function ReportIssueModal({
     floorRoom: '',
     description: '',
     priority: 'Medium',
+    coordinates: null,
+    locationPrecision: 'approximate-landmark',
+    locationSource: 'Approximate Landmark Location',
     exactLat: '',
     exactLng: '',
   });
@@ -74,6 +78,9 @@ export default function ReportIssueModal({
       floorRoom: '',
       description: '',
       priority: 'Medium',
+      coordinates: null,
+      locationPrecision: 'approximate-landmark',
+      locationSource: 'Approximate Landmark Location',
       exactLat: '',
       exactLng: '',
     });
@@ -180,7 +187,26 @@ export default function ReportIssueModal({
     let exactCoords = null;
     let locationPrecision =
       formData.building === 'Other / Unmapped New Town Location' ? 'unmapped' : 'approximate-landmark';
+    let locationSource = 'Approximate Landmark Location';
+
     if (
+      formData.coordinates &&
+      typeof formData.coordinates.lat === 'number' &&
+      typeof formData.coordinates.lng === 'number' &&
+      !isNaN(formData.coordinates.lat) &&
+      !isNaN(formData.coordinates.lng)
+    ) {
+      exactCoords = {
+        lat: Number(formData.coordinates.lat.toFixed(5)),
+        lng: Number(formData.coordinates.lng.toFixed(5)),
+      };
+      locationPrecision = formData.locationPrecision === 'verified-gps' ? 'verified-gps' : 'user-pinned';
+      locationSource =
+        formData.locationSource ||
+        (locationPrecision === 'verified-gps'
+          ? 'Browser Geolocation (GPS)'
+          : 'Pinned on Interactive Map');
+    } else if (
       formData.exactLat &&
       formData.exactLng &&
       String(formData.exactLat).trim() !== '' &&
@@ -189,9 +215,16 @@ export default function ReportIssueModal({
       const parsedLat = parseFloat(formData.exactLat);
       const parsedLng = parseFloat(formData.exactLng);
       if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-        exactCoords = { lat: parsedLat, lng: parsedLng };
-        locationPrecision = 'verified-gps';
+        exactCoords = { lat: Number(parsedLat.toFixed(5)), lng: Number(parsedLng.toFixed(5)) };
+        locationPrecision = 'user-pinned';
+        locationSource = 'Manual Coordinate Entry';
       }
+    }
+
+    if (formData.locationPrecision === 'unmapped' || formData.building === 'Other / Unmapped New Town Location') {
+      exactCoords = null;
+      locationPrecision = 'unmapped';
+      locationSource = 'Unmapped Queue';
     }
 
     const newIssue = {
@@ -213,6 +246,7 @@ export default function ReportIssueModal({
       isMyReport: true,
       coordinates: exactCoords,
       locationPrecision,
+      locationSource,
     };
 
     if (onSubmitIssue) {
@@ -348,12 +382,49 @@ export default function ReportIssueModal({
                 )}
               </div>
 
-              {/* Field 3: Area & Exact Location */}
-              <div className="space-y-2">
-                <label className="block font-semibold text-slate-800">
-                  3. Location in New Town <span className="text-rose-600">*</span>
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {/* Field 3: Location in New Town with Interactive Location Picker */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-semibold text-slate-800">
+                    3. Location in New Town <span className="text-rose-600">*</span>
+                  </label>
+                  <span className="text-[11px] text-slate-400">
+                    Pin damage spot on map, search, or select below
+                  </span>
+                </div>
+
+                {/* Interactive Leaflet/OpenStreetMap Location Picker */}
+                <LocationPicker
+                  coordinates={formData.coordinates}
+                  locationPrecision={formData.locationPrecision}
+                  locationSource={formData.locationSource}
+                  onChange={({
+                    coordinates,
+                    locationPrecision,
+                    locationSource,
+                    floorRoom,
+                    area,
+                    sector,
+                  }) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      coordinates: coordinates || null,
+                      locationPrecision: locationPrecision || prev.locationPrecision,
+                      locationSource: locationSource || prev.locationSource,
+                      exactLat: coordinates?.lat ? String(coordinates.lat) : '',
+                      exactLng: coordinates?.lng ? String(coordinates.lng) : '',
+                      area: area && NEW_TOWN_AREAS.includes(area) ? area : prev.area,
+                      building: sector && NEW_TOWN_SECTORS.includes(sector) ? sector : prev.building,
+                      floorRoom: floorRoom !== undefined ? floorRoom : prev.floorRoom,
+                    }));
+                    if (errors.floorRoom && floorRoom) {
+                      setErrors((prev) => ({ ...prev, floorRoom: null }));
+                    }
+                  }}
+                />
+
+                {/* Structured Area & Nearest Landmark Sector */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <div>
                     <label htmlFor="issue-area" className="text-[11px] text-slate-500 block mb-0.5">
                       Action Area:
@@ -379,7 +450,19 @@ export default function ReportIssueModal({
                     <select
                       id="issue-sector"
                       value={formData.building}
-                      onChange={(e) => handleInputChange('building', e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleInputChange('building', val);
+                        if (val === 'Other / Unmapped New Town Location') {
+                          setFormData((prev) => ({
+                            ...prev,
+                            building: val,
+                            coordinates: null,
+                            locationPrecision: 'unmapped',
+                            locationSource: 'Unmapped',
+                          }));
+                        }
+                      }}
                       className="w-full px-3 py-2 rounded-md border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600 truncate"
                     >
                       {NEW_TOWN_SECTORS.map((s) => (
@@ -414,37 +497,6 @@ export default function ReportIssueModal({
                       <span>{errors.floorRoom}</span>
                     </p>
                   )}
-                </div>
-
-                {/* Optional Exact GPS Coordinates */}
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-semibold text-slate-700">
-                      Exact GPS Coordinates (optional)
-                    </label>
-                    <span className="text-[10px] text-slate-400">Leave blank if unknown</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="any"
-                      placeholder="Latitude (e.g. 22.5835)"
-                      value={formData.exactLat}
-                      onChange={(e) => handleInputChange('exactLat', e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600"
-                    />
-                    <input
-                      type="number"
-                      step="any"
-                      placeholder="Longitude (e.g. 88.4550)"
-                      value={formData.exactLng}
-                      onChange={(e) => handleInputChange('exactLng', e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600"
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    Honest mapping policy: If left blank, approximate landmark coordinates will be used instead of fabricating random GPS points.
-                  </p>
                 </div>
               </div>
 

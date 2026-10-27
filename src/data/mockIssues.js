@@ -4795,7 +4795,7 @@ export function resolveIssueCoordinates(issue) {
     return null;
   }
 
-  // 1. Exact verified GPS if stored directly on issue
+  // 1. Exact verified GPS or user-pinned coordinates stored directly on issue
   if (
     issue.coordinates &&
     typeof issue.coordinates.lat === 'number' &&
@@ -4804,11 +4804,16 @@ export function resolveIssueCoordinates(issue) {
     !isNaN(issue.coordinates.lng)
   ) {
     const isExact = issue.locationPrecision === 'verified-gps';
+    const isUserPinned = issue.locationPrecision === 'user-pinned';
     return {
       lat: issue.coordinates.lat,
       lng: issue.coordinates.lng,
       isExact: isExact,
-      source: isExact ? 'Verified GPS Coordinates' : (issue.locationSource || 'Approximate Landmark Location'),
+      source: isExact
+        ? 'Verified GPS Coordinates'
+        : isUserPinned
+        ? (issue.locationSource || 'User-Pinned Location')
+        : (issue.locationSource || 'Approximate Landmark Location'),
     };
   }
 

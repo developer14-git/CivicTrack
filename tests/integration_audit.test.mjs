@@ -516,6 +516,43 @@ runTest('validateAndParseBackupJSON Enforces Valid Data', () => {
   assert.strictEqual(resEmpty.valid, false);
 });
 
+runTest('Storage Compatibility for User-Pinned and GPS Coordinates', () => {
+  const userPinnedReport = {
+    id: 'CT-205',
+    title: 'Damaged sidewalk slab with exposed rebar',
+    category: 'Roads and Footpaths',
+    status: 'Open',
+    priority: 'High',
+    area: 'Action Area I',
+    building: 'Action Area I • CB & CE Residential Blocks',
+    floorRoom: 'Street 106, near CE Block Market Gate',
+    location: 'Action Area I • Street 106',
+    coordinates: { lat: 22.58412, lng: 88.45567 },
+    locationPrecision: 'user-pinned',
+    locationSource: 'Pinned on Interactive Map',
+  };
+
+  assert.strictEqual(isValidIssueSchema(userPinnedReport), true, 'User-pinned issue must pass schema validation');
+
+  const sanitized = sanitizeIssueForStorage(userPinnedReport);
+  assert.deepStrictEqual(
+    sanitized.coordinates,
+    { lat: 22.58412, lng: 88.45567 },
+    'Coordinates must be preserved during storage sanitization'
+  );
+  assert.strictEqual(
+    sanitized.locationPrecision,
+    'user-pinned',
+    'locationPrecision must be preserved during storage sanitization'
+  );
+
+  const backupJson = JSON.stringify({ app: 'CivicTrack', issues: [userPinnedReport] });
+  const parsedBackup = validateAndParseBackupJSON(backupJson);
+  assert.strictEqual(parsedBackup.valid, true);
+  assert.deepStrictEqual(parsedBackup.issues[0].coordinates, { lat: 22.58412, lng: 88.45567 });
+  assert.strictEqual(parsedBackup.issues[0].locationPrecision, 'user-pinned');
+});
+
 // -------------------------------------------------------------
 // 5. Tour Navigation Integrity
 // -------------------------------------------------------------

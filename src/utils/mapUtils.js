@@ -184,6 +184,10 @@ export function createPopupHtml(issue, isExactLocation = false) {
       ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified GPS
          </span>`
+      : precision === 'user-pinned'
+      ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+           <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> User-Pinned Location
+         </span>`
       : precision === 'unmapped'
       ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Unmapped Queue
@@ -229,8 +233,9 @@ export function createPopupHtml(issue, isExactLocation = false) {
           <span class="font-medium text-slate-400 shrink-0">Location:</span>
           <span class="text-slate-700 truncate">${escapeHtml(issue.location || issue.building || 'New Town, Kolkata')}</span>
         </div>
-        <div class="pt-0.5">
+        <div class="pt-0.5 flex items-center gap-1.5 flex-wrap">
           ${locBadge}
+          ${issue.coordinates?.lat && issue.coordinates?.lng ? `<span class="font-mono text-[9px] text-slate-400">(${Number(issue.coordinates.lat).toFixed(4)}, ${Number(issue.coordinates.lng).toFixed(4)})</span>` : ''}
         </div>
       </div>
 

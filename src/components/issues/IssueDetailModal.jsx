@@ -242,10 +242,14 @@ export default function IssueDetailModal({
                         : `${issue.building || 'New Town'}`)}
                   </span>
                 </span>
-                <div className="mt-1">
+                <div className="mt-1 flex items-center gap-2 flex-wrap">
                   {issue.locationPrecision === 'verified-gps' ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified GPS
+                    </span>
+                  ) : issue.locationPrecision === 'user-pinned' ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span> User-Pinned Location
                     </span>
                   ) : issue.locationPrecision === 'unmapped' ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
@@ -254,6 +258,11 @@ export default function IssueDetailModal({
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Approximate Landmark Location
+                    </span>
+                  )}
+                  {issue.coordinates?.lat && issue.coordinates?.lng && (
+                    <span className="text-[10px] font-mono text-slate-500">
+                      ({Number(issue.coordinates.lat).toFixed(5)}, {Number(issue.coordinates.lng).toFixed(5)})
                     </span>
                   )}
                 </div>
