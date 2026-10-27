@@ -4,6 +4,9 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
+  MapPin,
+  CheckCircle2,
 } from 'lucide-react';
 import StatusBadge from '../common/StatusBadge';
 import PriorityBadge from '../common/PriorityBadge';
@@ -447,66 +450,129 @@ export default function AccountabilityView({
       </section>
 
       {/* 5. Overdue Issues (Compact, Readable List) */}
-      <section aria-label="Overdue Issues" className="text-left space-y-2">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pb-1.5 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-slate-900">Overdue Issues</h2>
+      <section aria-label="Overdue issues" className="text-left space-y-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 pb-2 border-b border-slate-200/80">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base font-semibold text-slate-900 tracking-tight">Overdue issues</h2>
             {metrics.sortedOverdueIssues.length > 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-slate-100 text-slate-600 border border-slate-200/80">
                 {metrics.sortedOverdueIssues.length}
               </span>
             )}
           </div>
-          <span className="text-xs text-slate-400">
-            Target SLA: High (24h) &bull; Medium (72h) &bull; Low (7d)
-          </span>
+          <p className="text-xs text-slate-500 font-normal">
+            Target resolution SLA: High (24h) &bull; Medium (72h) &bull; Low (7d)
+          </p>
         </div>
 
         {metrics.sortedOverdueIssues.length > 0 ? (
-          <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100 overflow-hidden">
-            {metrics.sortedOverdueIssues.map((issue) => {
-              const timeRemaining = formatTimeRemaining(issue, currentTime);
-              return (
-                <div
-                  key={issue.id}
-                  onClick={() => onOpenIssueDetail(issue.id)}
-                  className="p-3 sm:py-2.5 sm:px-4 hover:bg-slate-50 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-                >
-                  <div className="min-w-0 flex-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                    <span className="font-mono text-xs font-semibold text-slate-500 shrink-0">
-                      #{issue.id}
-                    </span>
-                    <h3 className="text-sm font-semibold text-slate-900 leading-snug break-words">
-                      {issue.title}
-                    </h3>
-                    <span className="text-slate-400">&bull;</span>
-                    <span className="text-slate-500">{issue.location}</span>
-                  </div>
+          <div className="bg-white rounded-lg border border-slate-200/80 overflow-hidden">
+            {/* Desktop Column Headers */}
+            <div className="hidden md:flex items-center justify-between px-4 py-2 bg-slate-50/70 border-b border-slate-200/80 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+              <div className="flex-1 min-w-0 pr-4">Issue</div>
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="w-20 shrink-0 text-left">Priority</div>
+                <div className="w-28 shrink-0 text-left">Status</div>
+                <div className="w-28 shrink-0 text-right">Overdue by</div>
+                <div className="w-24 shrink-0 text-right">Action</div>
+              </div>
+            </div>
 
-                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-center pt-1 sm:pt-0">
-                    <PriorityBadge priority={issue.priority} size="sm" />
-                    <StatusBadge status={issue.status} size="sm" />
-                    <span className="text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                      Overdue {timeRemaining}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenIssueDetail(issue.id);
-                      }}
-                      className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 px-2 py-1 rounded hover:bg-emerald-50 transition-colors"
-                    >
-                      Inspect
-                    </button>
+            {/* Issues List */}
+            <div>
+              {metrics.sortedOverdueIssues.map((issue) => {
+                const rawRemaining = formatTimeRemaining(issue, currentTime);
+                const durationOnly = rawRemaining.replace(/^Overdue\s*(by\s*)?/i, '').trim();
+                const overdueDisplay = durationOnly ? `${durationOnly} overdue` : 'Overdue';
+
+                return (
+                  <div
+                    key={issue.id}
+                    onClick={() => onOpenIssueDetail(issue.id)}
+                    className="group px-4 py-3 hover:bg-slate-50/70 transition-colors cursor-pointer border-b border-slate-100 last:border-b-0 flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4 text-xs"
+                  >
+                    {/* Issue Details: ID, Title, and Location */}
+                    <div className="min-w-0 flex-1 md:pr-4">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-mono text-xs text-slate-400 shrink-0 select-all">
+                          #{issue.id}
+                        </span>
+                        <h3
+                          className="text-sm font-semibold text-slate-900 group-hover:text-emerald-950 transition-colors line-clamp-2 md:truncate"
+                          title={issue.title}
+                        >
+                          {issue.title}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                        <span className="truncate" title={issue.location}>{issue.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Attributes & Action */}
+                    <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-3 pt-2 md:pt-0 border-t border-slate-100 md:border-t-0 md:gap-4 shrink-0">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        {/* Priority */}
+                        <div className="md:w-20 shrink-0 flex items-center">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-700">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                issue.priority === 'High'
+                                  ? 'bg-rose-500'
+                                  : issue.priority === 'Medium'
+                                  ? 'bg-amber-500'
+                                  : 'bg-slate-400'
+                              }`}
+                              aria-hidden="true"
+                            />
+                            <span className="font-normal">{issue.priority}</span>
+                          </span>
+                        </div>
+
+                        {/* Status */}
+                        <div className="md:w-28 shrink-0 flex items-center">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-700 border border-slate-200/80">
+                            {issue.status}
+                          </span>
+                        </div>
+
+                        {/* Overdue Duration */}
+                        <div className="md:w-28 shrink-0 md:text-right flex items-center md:justify-end">
+                          <span className="text-xs font-mono font-medium text-rose-600">
+                            {overdueDisplay}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action */}
+                      <div className="md:w-24 shrink-0 text-right flex items-center justify-end ml-auto md:ml-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenIssueDetail(issue.id);
+                          }}
+                          className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-900 group-hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 rounded py-0.5"
+                          aria-label={`View issue #${issue.id}: ${issue.title}`}
+                        >
+                          <span>View issue</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-emerald-600 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-slate-200 p-4 text-center text-xs text-slate-500">
-            No overdue issues. All reports are within target resolution deadlines.
+          <div className="bg-white rounded-lg border border-slate-200/80 p-8 text-center text-xs text-slate-500">
+            <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mx-auto mb-2.5">
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+            </div>
+            <p className="font-medium text-slate-800 text-sm">No overdue issues</p>
+            <p className="text-xs text-slate-500 mt-0.5">All active reports are currently within their target SLA resolution windows.</p>
           </div>
         )}
       </section>
