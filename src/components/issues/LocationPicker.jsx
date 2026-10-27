@@ -72,6 +72,10 @@ export default function LocationPicker({
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Debounce and abort refs for geocoding queries
+  const debounceTimerRef = useRef(null);
+  const abortControllerRef = useRef(null);
+
   // Navigated landmark context (when searching without automatically setting pin)
   const [navigatedLandmark, setNavigatedLandmark] = useState(null);
 
@@ -98,6 +102,18 @@ export default function LocationPicker({
   const nearestLandmark = displayCoords?.lat && displayCoords?.lng
     ? findNearestLandmark(displayCoords.lat, displayCoords.lng)
     : null;
+
+  // Cleanup debounce and abort on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // Close search dropdown when clicking outside
   useEffect(() => {
@@ -313,44 +329,67 @@ export default function LocationPicker({
     }
   }, [coordinates, setOrMoveMarker, removeMarker]);
 
-  // Handle search text changes
+  // Handle search text changes with local matching and debounced remote geocoding
   const handleSearchChange = (e) => {
     const val = e.target.value;
     setSearchQuery(val);
 
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     if (!val.trim()) {
       setSearchResults([]);
       setIsSearchOpen(false);
+      setIsSearching(false);
       return;
     }
 
-    // Local instant matches
+    // 1. Instant local New Town matches
     const localMatches = searchNewTownLocations(val, 6);
     setSearchResults(localMatches);
     setIsSearchOpen(true);
 
-    // Remote OSM geocoding fallback
+    // 2. Debounced external Nominatim search if query is 3+ chars
     if (val.trim().length >= 3) {
       setIsSearching(true);
-      searchNominatim(val)
-        .then((remoteResults) => {
-          setIsSearching(false);
-          if (remoteResults.length > 0) {
-            setSearchResults((prev) => {
-              const combined = [...prev];
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      debounceTimerRef.current = setTimeout(() => {
+        searchNominatim(val, controller.signal)
+          .then((remoteResults) => {
+            setIsSearching(false);
+            if (controller.signal.aborted) return;
+
+            setSearchResults(() => {
+              const combined = [...localMatches];
               remoteResults.forEach((rem) => {
-                const already = combined.some(
-                  (c) => Math.hypot(c.coordinates.lat - rem.coordinates.lat, c.coordinates.lng - rem.coordinates.lng) < 0.001
+                const remNameLower = rem.name.toLowerCase();
+                const isDup = combined.some(
+                  (c) =>
+                    c.name.toLowerCase() === remNameLower ||
+                    (Math.abs(c.coordinates.lat - rem.coordinates.lat) < 0.0015 &&
+                      Math.abs(c.coordinates.lng - rem.coordinates.lng) < 0.0015)
                 );
-                if (!already) combined.push(rem);
+                if (!isDup) {
+                  combined.push(rem);
+                }
               });
               return combined.slice(0, 8);
             });
-          }
-        })
-        .catch(() => {
-          setIsSearching(false);
-        });
+          })
+          .catch(() => {
+            if (!controller.signal.aborted) {
+              setIsSearching(false);
+            }
+          });
+      }, 350);
+    } else {
+      setIsSearching(false);
     }
   };
 
@@ -359,11 +398,20 @@ export default function LocationPicker({
     setIsSearchOpen(false);
     setGeoError(null);
     setGeoNotice(null);
-    setNavigatedLandmark(result);
+    if (!result?.coordinates) return;
+
+    const lat = Number(result.coordinates.lat);
+    const lng = Number(result.coordinates.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    setNavigatedLandmark({
+      ...result,
+      coordinates: { lat, lng },
+    });
 
     const map = mapInstanceRef.current;
     if (map) {
-      map.flyTo([result.coordinates.lat, result.coordinates.lng], 16, { duration: 0.6 });
+      map.flyTo([lat, lng], 16, { duration: 0.6 });
       setTimeout(() => {
         map.invalidateSize();
       }, 300);
@@ -377,8 +425,9 @@ export default function LocationPicker({
     setGeoNotice(null);
     setNavigatedLandmark(null);
 
-    const lat = result.coordinates.lat;
-    const lng = result.coordinates.lng;
+    const lat = Number(result.coordinates.lat);
+    const lng = Number(result.coordinates.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
 
     setOrMoveMarker(lat, lng, true);
 
@@ -522,7 +571,14 @@ export default function LocationPicker({
             onChange={handleSearchChange}
             onFocus={() => searchQuery.trim() && setIsSearchOpen(true)}
             onKeyDown={(e) => {
-              if (e.key === 'Escape') setIsSearchOpen(false);
+              if (e.key === 'Escape') {
+                setIsSearchOpen(false);
+              } else if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent accidental form submission
+                if (searchResults.length > 0) {
+                  handleNavigateToLandmark(searchResults[0]);
+                }
+              }
             }}
             placeholder="Search landmark, road, or area to pan map..."
             disabled={disabled}
@@ -535,6 +591,7 @@ export default function LocationPicker({
                 setSearchQuery('');
                 setSearchResults([]);
                 setIsSearchOpen(false);
+                setIsSearching(false);
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
               aria-label="Clear search text"
@@ -544,54 +601,75 @@ export default function LocationPicker({
           )}
 
           {/* Autocomplete Results Dropdown with Navigation vs Pinning Distinction */}
-          {isSearchOpen && searchResults.length > 0 && (
+          {isSearchOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 z-[1500] bg-white border border-slate-200 rounded-md shadow-xl max-h-60 overflow-y-auto">
-              <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-500 bg-slate-50 border-b border-slate-100 uppercase tracking-wider flex items-center justify-between">
-                <span>Select to pan map or pin</span>
-                {isSearching && <span className="text-emerald-700 font-normal">Searching OSM...</span>}
-              </div>
-              {searchResults.map((res) => (
-                <div
-                  key={res.id || `${res.coordinates.lat}-${res.coordinates.lng}`}
-                  className="px-2.5 py-2 hover:bg-slate-50 border-b border-slate-100 last:border-none flex items-center justify-between gap-2 transition-colors"
-                >
-                  <button
-                    type="button"
-                    onClick={() => handleNavigateToLandmark(res)}
-                    className="min-w-0 flex-1 text-left flex items-start gap-2 cursor-pointer group"
-                  >
-                    <Compass className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <div className="min-w-0">
-                      <div className="font-semibold text-slate-800 group-hover:text-emerald-800 truncate">
-                        {res.name}
-                      </div>
-                      <div className="text-[10px] text-slate-500 truncate">
-                        {res.area || 'New Town, Kolkata'} &bull; {res.coordinates.lat.toFixed(4)}, {res.coordinates.lng.toFixed(4)}
-                      </div>
-                    </div>
-                  </button>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleNavigateToLandmark(res)}
-                      title="Pan map to this landmark"
-                      className="px-2 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <Eye className="w-3 h-3 text-slate-600" />
-                      <span>Pan Map</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handlePinAtLandmark(res)}
-                      title="Set pin directly at this landmark"
-                      className="px-2 py-1 text-[10px] font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded shadow-2xs cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <MapPin className="w-3 h-3" />
-                      <span>Pin Here</span>
-                    </button>
+              {isSearching && searchResults.length === 0 ? (
+                <div className="px-3 py-3 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 text-emerald-700 animate-spin" />
+                  <span>Searching locations in New Town, Kolkata...</span>
+                </div>
+              ) : !isSearching && searchResults.length === 0 && searchQuery.trim().length >= 2 ? (
+                <div className="px-3 py-3 text-center text-slate-500 text-xs">
+                  <AlertCircle className="w-4 h-4 mx-auto mb-1 text-slate-400" />
+                  <div className="font-semibold text-slate-700">No matching location found</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Try searching for a nearby New Town landmark, road, or Action Area
                   </div>
                 </div>
-              ))}
+              ) : searchResults.length > 0 ? (
+                <>
+                  <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-500 bg-slate-50 border-b border-slate-100 uppercase tracking-wider flex items-center justify-between">
+                    <span>Select a location to pan map or pin</span>
+                    {isSearching && (
+                      <span className="text-emerald-700 font-normal inline-flex items-center gap-1">
+                        <Loader2 className="w-2.5 h-2.5 animate-spin" /> Searching...
+                      </span>
+                    )}
+                  </div>
+                  {searchResults.map((res) => (
+                    <div
+                      key={res.id || `${res.coordinates.lat}-${res.coordinates.lng}`}
+                      className="px-2.5 py-2 hover:bg-slate-50 border-b border-slate-100 last:border-none flex items-center justify-between gap-2 transition-colors"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleNavigateToLandmark(res)}
+                        className="min-w-0 flex-1 text-left flex items-start gap-2 cursor-pointer group"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-800 group-hover:text-emerald-800 truncate">
+                            {res.name}
+                          </div>
+                          <div className="text-[10px] text-slate-500 truncate">
+                            {res.locality || res.area || 'New Town, Kolkata'} &bull; {res.coordinates.lat.toFixed(4)}, {res.coordinates.lng.toFixed(4)}
+                          </div>
+                        </div>
+                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleNavigateToLandmark(res)}
+                          title="Pan map to this landmark"
+                          className="px-2 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          <span>Pan Map</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handlePinAtLandmark(res)}
+                          title="Set pin directly at this landmark"
+                          className="px-2 py-1 text-[10px] font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded shadow-2xs cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          <span>Pin Here</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : null}
             </div>
           )}
         </div>
@@ -631,7 +709,7 @@ export default function LocationPicker({
             <div className="text-[11px] leading-tight min-w-0">
               <span className="font-semibold text-emerald-900">Map view moved to:</span>{' '}
               <strong className="font-bold text-slate-900">{navigatedLandmark.name}</strong>{' '}
-              <span className="text-slate-600">({navigatedLandmark.area})</span>
+              <span className="text-slate-600">({navigatedLandmark.locality || navigatedLandmark.area})</span>
               <div className="text-[10px] text-emerald-800 mt-0.5">
                 Click anywhere on the map to pin the exact damage spot, or select the landmark point below:
               </div>

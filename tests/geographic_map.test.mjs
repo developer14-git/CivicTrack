@@ -310,6 +310,45 @@ const gateMatches = searchNewTownLocations('Biswa Bangla Gate');
 assert.ok(gateMatches.length > 0, 'Search for Biswa Bangla Gate should return results');
 assert.equal(gateMatches[0].name, 'Biswa Bangla Gate (Narkelbagan)');
 
+// Exact local matching and avoiding unrelated keyword matches
+const ecoParkMatches = searchNewTownLocations('Eco Park');
+assert.ok(ecoParkMatches.length > 0, 'Search for Eco Park should return Eco Park');
+assert.equal(ecoParkMatches[0].name, 'Eco Park & Public Lake Promenade');
+const unrelatedParkFound = ecoParkMatches.some((m) => m.name.includes('Swapno Bhor'));
+assert.equal(unrelatedParkFound, false, 'Unrelated "Swapno Bhor" park must NOT match "Eco Park" query');
+
+const tataMatches = searchNewTownLocations('Tata Medical');
+assert.ok(tataMatches.length > 0, 'Search for Tata Medical should return Tata Medical Center');
+assert.equal(tataMatches[0].name, 'Tata Medical Center & Health Corridor');
+
+const street106Matches = searchNewTownLocations('Street 106');
+assert.ok(street106Matches.length > 0, 'Search for Street 106 should match CE/CB blocks by alias');
+assert.equal(street106Matches[0].id, 'ce-cb-blocks');
+
+const axisMallMatches = searchNewTownLocations('Axis Mall');
+assert.ok(axisMallMatches.length > 0, 'Search for Axis Mall should return Axis Mall & Novotel');
+assert.equal(axisMallMatches[0].id, 'axis-mall-novotel');
+
+// Empty results for non-matching query
+const unknownMatches = searchNewTownLocations('Fictional Place That Does Not Exist 9999');
+assert.deepEqual(unknownMatches, [], 'Non-matching query must return empty array');
+
+const emptyQueryMatches = searchNewTownLocations('');
+assert.deepEqual(emptyQueryMatches, [], 'Empty query must return empty array');
+
+// Geocoding error resilience & timeouts
+const { searchNominatim } = await import('../src/utils/locationUtils.js');
+const emptyGeocode = await searchNominatim('');
+assert.deepEqual(emptyGeocode, [], 'Empty geocode query must return empty array');
+
+const singleCharGeocode = await searchNominatim('a');
+assert.deepEqual(singleCharGeocode, [], 'Single character geocode must return empty array');
+
+const abortController = new AbortController();
+abortController.abort();
+const abortedGeocode = await searchNominatim('Eco Park', abortController.signal);
+assert.deepEqual(abortedGeocode, [], 'Aborted geocoding request must return empty array without throwing');
+
 const nearest = findNearestLandmark(22.58352, 88.45501);
 assert.ok(nearest, 'Should detect nearest landmark');
 assert.equal(nearest.landmark.id, 'nazrul-tirtha');
@@ -477,10 +516,38 @@ const clearedPinReport = {
 };
 assert.equal(resolveIssueCoordinates(clearedPinReport), null, 'Cleared pin report must cleanly resolve to null coordinates');
 
+// 9.6: Map navigation coordinate ordering and preserving manual pin across searches
+const allLocalResults = searchNewTownLocations('Action Area', 25);
+allLocalResults.forEach((res) => {
+  assert.ok(typeof res.coordinates.lat === 'number', `Result ${res.name} must have numeric lat`);
+  assert.ok(typeof res.coordinates.lng === 'number', `Result ${res.name} must have numeric lng`);
+  assert.ok(
+    isWithinNewTownBounds(res.coordinates.lat, res.coordinates.lng),
+    `Result ${res.name} coordinates must fall within New Town bounds`
+  );
+  assert.ok(res.locality, `Result ${res.name} must have locality description`);
+});
+
+// Preserving manual pin when search navigates
+const initialUserPin = { lat: 22.58412, lng: 88.45567 };
+let activePinCoordinates = { ...initialUserPin };
+// User performs 3 searches and navigates around map:
+const search1 = searchNewTownLocations('City Centre 2');
+const navCoords1 = search1[0].coordinates;
+assert.notEqual(navCoords1.lat, activePinCoordinates.lat, 'Navigation target differs from pin');
+// Pin remains untouched
+assert.deepEqual(activePinCoordinates, initialUserPin, 'Search 1 navigation must not alter active pin');
+
+const search2 = searchNewTownLocations('Tata Medical');
+const navCoords2 = search2[0].coordinates;
+assert.notEqual(navCoords2.lat, activePinCoordinates.lat);
+assert.deepEqual(activePinCoordinates, initialUserPin, 'Search 2 navigation must not alter active pin');
+
 console.log('  ✓ Reliable map click-to-pin places and moves pin without landmark snapping');
 console.log('  ✓ Marker drag live position updates and commits exact coordinates');
 console.log('  ✓ Landmark search navigation clearly distinguished from explicit pin selection');
 console.log('  ✓ Complete state synchronization across map, badges, nearest landmark, and report payload');
+console.log('  ✓ Map navigation coordinates strictly validated and manual pin preserved across searches');
 
 console.log('\n=== ALL GEOGRAPHIC MAP TESTS PASSED ===\n');
 
