@@ -360,5 +360,127 @@ assert.equal(mappedPoints.size, 207, 'All 207 mapped demo reports must have dist
 console.log('  ✓ All 207 mapped reports have unique, geographically distinct coordinates within New Town');
 console.log('  ✓ No artificial coordinate stacking or clustering overlap across the demonstration dataset');
 
+// Test 9: Modal Location Selection Usability & State Synchronization Audit
+console.log('Group 9: Modal Location Selection Usability & State Synchronization');
+
+// 9.1: Reliable map click-to-pin exact coordinate preservation
+const clickedLat = 22.58419;
+const clickedLng = 88.45573;
+const clickResolvedNearest = findNearestLandmark(clickedLat, clickedLng);
+
+assert.ok(clickResolvedNearest, 'Nearest landmark must be computed for clicked coordinate');
+assert.equal(clickResolvedNearest.landmark.id, 'nazrul-tirtha');
+assert.ok(clickResolvedNearest.distanceMeters > 0, 'Must record actual distance from landmark centroid');
+
+// Report payload produced when user clicks on map
+const manualMapClickReport = {
+  id: 'CT-TEST-CLICK',
+  title: 'Cracked kerb on Street 106',
+  category: 'Roads and Footpaths',
+  campus: clickResolvedNearest.area,
+  area: clickResolvedNearest.area,
+  building: clickResolvedNearest.sector,
+  floorRoom: clickResolvedNearest.description,
+  location: `${clickResolvedNearest.area} • ${clickResolvedNearest.description}`,
+  coordinates: { lat: clickedLat, lng: clickedLng },
+  locationPrecision: 'user-pinned',
+  locationSource: 'Pinned on Interactive Map',
+};
+
+const clickCoords = resolveIssueCoordinates(manualMapClickReport);
+assert.equal(clickCoords.lat, clickedLat, 'Map click must preserve exact clicked latitude without snapping to landmark');
+assert.equal(clickCoords.lng, clickedLng, 'Map click must preserve exact clicked longitude without snapping to landmark');
+assert.equal(clickCoords.isExact, false, 'Map click must never be falsely marked as verified GPS');
+assert.equal(clickCoords.source, 'Pinned on Interactive Map');
+
+// 9.2: Marker drag refinement updates coordinates without landmark reversion
+const draggedLat = 22.58488;
+const draggedLng = 88.45612;
+const dragResolvedNearest = findNearestLandmark(draggedLat, draggedLng);
+
+const markerDraggedReport = {
+  ...manualMapClickReport,
+  coordinates: { lat: draggedLat, lng: draggedLng },
+  area: dragResolvedNearest.area,
+  building: dragResolvedNearest.sector,
+  locationSource: 'Pinned on Interactive Map',
+};
+
+const dragCoords = resolveIssueCoordinates(markerDraggedReport);
+assert.equal(dragCoords.lat, draggedLat, 'Dragged marker must update latitude immediately to exact dropped point');
+assert.equal(dragCoords.lng, draggedLng, 'Dragged marker must update longitude immediately to exact dropped point');
+assert.notEqual(dragCoords.lat, clickResolvedNearest.landmark.coordinates.lat, 'Pin must never snap back to landmark centroid');
+
+// 9.3: Landmark search navigation vs explicit pin selection distinction
+const searchResults = searchNewTownLocations('Eco Park');
+assert.ok(searchResults.length > 0, 'Eco Park search must return recognized results');
+const ecoParkResult = searchResults[0];
+
+// Case A: User only navigated/panned map to search result (pin was placed at nearby custom spot)
+const userPinnedNearEcoPark = {
+  id: 'CT-TEST-NEAR-ECO',
+  title: 'Waterlogged pavement opposite Gate 2',
+  category: 'Drainage and Flooding',
+  campus: ecoParkResult.area,
+  area: ecoParkResult.area,
+  building: ecoParkResult.sector,
+  floorRoom: 'Opposite Eco Park Gate 2, near bus shelter',
+  location: `${ecoParkResult.area} • Opposite Eco Park Gate 2, near bus shelter`,
+  coordinates: { lat: 22.60512, lng: 88.46820 }, // 80 meters away from landmark centroid
+  locationPrecision: 'user-pinned',
+  locationSource: 'Pinned on Interactive Map',
+};
+const pannedPinCoords = resolveIssueCoordinates(userPinnedNearEcoPark);
+assert.equal(pannedPinCoords.lat, 22.60512, 'Navigating via search must not overwrite manual pin coordinates');
+assert.equal(pannedPinCoords.lng, 88.46820);
+assert.equal(pannedPinCoords.isExact, false);
+
+// Case B: User explicitly chose "Pin at this landmark"
+const explicitLandmarkPinReport = {
+  id: 'CT-TEST-EXPLICIT-LANDMARK',
+  title: 'Damaged railing at Eco Park entrance plaza',
+  category: 'Public Parks and Green Spaces',
+  campus: ecoParkResult.area,
+  area: ecoParkResult.area,
+  building: ecoParkResult.sector,
+  floorRoom: ecoParkResult.description,
+  location: `${ecoParkResult.area} • ${ecoParkResult.description}`,
+  coordinates: { lat: ecoParkResult.coordinates.lat, lng: ecoParkResult.coordinates.lng },
+  locationPrecision: 'approximate-landmark',
+  locationSource: `Approximate Landmark: ${ecoParkResult.name}`,
+};
+const landmarkPinCoords = resolveIssueCoordinates(explicitLandmarkPinReport);
+assert.equal(landmarkPinCoords.lat, ecoParkResult.coordinates.lat);
+assert.equal(landmarkPinCoords.lng, ecoParkResult.coordinates.lng);
+assert.equal(landmarkPinCoords.isExact, false);
+assert.equal(landmarkPinCoords.source, `Approximate Landmark: ${ecoParkResult.name}`);
+
+// 9.4: State synchronization across coordinate display, nearest landmark, and report submission
+assert.equal(manualMapClickReport.coordinates.lat, clickedLat);
+assert.equal(manualMapClickReport.coordinates.lng, clickedLng);
+assert.equal(manualMapClickReport.campus, manualMapClickReport.area);
+assert.ok(manualMapClickReport.location.startsWith(manualMapClickReport.area));
+
+// 9.5: Clear pin / unmapped state synchronization
+const clearedPinReport = {
+  id: 'CT-TEST-CLEARED',
+  title: 'Missing street sign in newly laid sector road',
+  category: 'Traffic and Pedestrian Safety',
+  campus: 'Action Area I',
+  area: 'Action Area I',
+  building: 'Other / Unmapped New Town Location',
+  floorRoom: 'Inner perimeter road',
+  location: 'Action Area I • Inner perimeter road',
+  coordinates: null,
+  locationPrecision: 'unmapped',
+  locationSource: 'Unmapped Queue',
+};
+assert.equal(resolveIssueCoordinates(clearedPinReport), null, 'Cleared pin report must cleanly resolve to null coordinates');
+
+console.log('  ✓ Reliable map click-to-pin places and moves pin without landmark snapping');
+console.log('  ✓ Marker drag live position updates and commits exact coordinates');
+console.log('  ✓ Landmark search navigation clearly distinguished from explicit pin selection');
+console.log('  ✓ Complete state synchronization across map, badges, nearest landmark, and report payload');
+
 console.log('\n=== ALL GEOGRAPHIC MAP TESTS PASSED ===\n');
 

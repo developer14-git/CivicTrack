@@ -200,12 +200,16 @@ export default function ReportIssueModal({
         lat: Number(formData.coordinates.lat.toFixed(5)),
         lng: Number(formData.coordinates.lng.toFixed(5)),
       };
-      locationPrecision = formData.locationPrecision === 'verified-gps' ? 'verified-gps' : 'user-pinned';
-      locationSource =
-        formData.locationSource ||
-        (locationPrecision === 'verified-gps'
-          ? 'Browser Geolocation (GPS)'
-          : 'Pinned on Interactive Map');
+      if (formData.locationPrecision === 'verified-gps') {
+        locationPrecision = 'verified-gps';
+        locationSource = formData.locationSource || 'Browser Geolocation (GPS)';
+      } else if (formData.locationPrecision === 'approximate-landmark') {
+        locationPrecision = 'approximate-landmark';
+        locationSource = formData.locationSource || 'Approximate Landmark Location';
+      } else {
+        locationPrecision = 'user-pinned';
+        locationSource = formData.locationSource || 'Pinned on Interactive Map';
+      }
     } else if (
       formData.exactLat &&
       formData.exactLng &&
@@ -405,19 +409,31 @@ export default function ReportIssueModal({
                     floorRoom,
                     area,
                     sector,
+                    nearestLandmark,
                   }) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      coordinates: coordinates || null,
-                      locationPrecision: locationPrecision || prev.locationPrecision,
-                      locationSource: locationSource || prev.locationSource,
-                      exactLat: coordinates?.lat ? String(coordinates.lat) : '',
-                      exactLng: coordinates?.lng ? String(coordinates.lng) : '',
-                      area: area && NEW_TOWN_AREAS.includes(area) ? area : prev.area,
-                      building: sector && NEW_TOWN_SECTORS.includes(sector) ? sector : prev.building,
-                      floorRoom: floorRoom !== undefined ? floorRoom : prev.floorRoom,
-                    }));
-                    if (errors.floorRoom && floorRoom) {
+                    setFormData((prev) => {
+                      const next = {
+                        ...prev,
+                        coordinates: coordinates || null,
+                        locationPrecision: locationPrecision || (coordinates ? 'user-pinned' : 'unmapped'),
+                        locationSource: locationSource || (coordinates ? 'Pinned on Interactive Map' : 'Unmapped'),
+                        exactLat: coordinates?.lat ? String(coordinates.lat) : '',
+                        exactLng: coordinates?.lng ? String(coordinates.lng) : '',
+                      };
+                      if (area && NEW_TOWN_AREAS.includes(area)) {
+                        next.area = area;
+                      }
+                      if (sector && NEW_TOWN_SECTORS.includes(sector)) {
+                        next.building = sector;
+                      }
+                      if (floorRoom !== undefined) {
+                        next.floorRoom = floorRoom;
+                      } else if (!prev.floorRoom && nearestLandmark?.description) {
+                        next.floorRoom = nearestLandmark.description;
+                      }
+                      return next;
+                    });
+                    if (errors.floorRoom) {
                       setErrors((prev) => ({ ...prev, floorRoom: null }));
                     }
                   }}
@@ -460,6 +476,8 @@ export default function ReportIssueModal({
                             coordinates: null,
                             locationPrecision: 'unmapped',
                             locationSource: 'Unmapped',
+                            exactLat: '',
+                            exactLng: '',
                           }));
                         }
                       }}
