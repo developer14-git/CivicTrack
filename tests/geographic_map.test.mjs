@@ -60,7 +60,7 @@ assert.equal(ct101Coords.source, 'Approximate Landmark Location');
 
 // Test genuine verified GPS issue (e.g. citizen submission or documented survey reading)
 const verifiedSurveyIssue = {
-  id: 'CT-201',
+  id: 'CT-FIXTURE-SURVEY-GPS',
   title: 'Surveyed issue with verified GPS reading',
   coordinates: { lat: 22.5835, lng: 88.4550 },
   locationPrecision: 'verified-gps',
@@ -168,13 +168,13 @@ expectedCategories.forEach((cat) => {
 console.log(`  ✓ All ${expectedCategories.length} comprehensive public infrastructure categories verified`);
 
 // Verify demo reports dataset
-assert.equal(INITIAL_ISSUES.length, 100, `INITIAL_ISSUES must contain exactly 100 demonstration reports (found ${INITIAL_ISSUES.length})`);
+assert.equal(INITIAL_ISSUES.length, 225, `INITIAL_ISSUES must contain exactly 225 demonstration reports (found ${INITIAL_ISSUES.length})`);
 
-// Verify unique contiguous IDs CT-101 through CT-200
+// Verify unique contiguous IDs CT-101 through CT-325
 const ids = INITIAL_ISSUES.map((i) => i.id);
 const uniqueIds = new Set(ids);
-assert.equal(uniqueIds.size, 100, 'All 100 report IDs must be strictly unique');
-for (let num = 101; num <= 200; num++) {
+assert.equal(uniqueIds.size, 225, 'All 225 report IDs must be strictly unique');
+for (let num = 101; num <= 325; num++) {
   assert.ok(uniqueIds.has(`CT-${num}`), `Report ID CT-${num} must exist`);
 }
 
@@ -190,7 +190,7 @@ INITIAL_ISSUES.forEach((issue) => {
 // Verify category representation across all 12 categories
 expectedCategories.forEach((cat) => {
   const count = INITIAL_ISSUES.filter((i) => i.category === cat).length;
-  assert.ok(count >= 5, `Category "${cat}" must have at least 5 reports (found ${count})`);
+  assert.ok(count >= 10, `Category "${cat}" must have at least 10 reports (found ${count})`);
 });
 
 // Verify location precision distribution
@@ -199,15 +199,15 @@ const approxCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'approx
 const unmappedCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'unmapped').length;
 
 assert.equal(verifiedCount, 0, 'No hardcoded demo reports should claim verified GPS without real survey evidence');
-assert.equal(approxCount, 92, 'Exactly 92 demo reports have approximate landmark coordinates');
-assert.equal(unmappedCount, 8, 'Exactly 8 demo reports remain in unmapped queue');
-assert.equal(verifiedCount + approxCount + unmappedCount, 100, 'All 100 reports accounted for exactly once across precision sets');
+assert.equal(approxCount, 207, 'Exactly 207 demo reports have approximate landmark coordinates');
+assert.equal(unmappedCount, 18, 'Exactly 18 demo reports remain in unmapped queue');
+assert.equal(verifiedCount + approxCount + unmappedCount, 225, 'All 225 reports accounted for exactly once across precision sets');
 
 // Verify unmapped queue
 const unmappedIds = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'unmapped').map((i) => i.id);
 assert.deepEqual(
   unmappedIds,
-  ['CT-109', 'CT-134', 'CT-135', 'CT-155', 'CT-168', 'CT-179', 'CT-191', 'CT-200'],
+  ['CT-109', 'CT-134', 'CT-135', 'CT-155', 'CT-168', 'CT-179', 'CT-191', 'CT-200', 'CT-205', 'CT-210', 'CT-218', 'CT-225', 'CT-235', 'CT-245', 'CT-257', 'CT-270', 'CT-283', 'CT-325'],
   'Unmapped queue must match expected unmapped report IDs'
 );
 
@@ -227,7 +227,7 @@ assert.ok(
 );
 assert.ok(statusesRepresented.has('Resolved'), 'Demo dataset must include Resolved reports');
 
-console.log(`  ✓ Demonstration dataset verified: 100 reports (0 verified GPS, 92 approximate landmark, 8 unmapped), all unique IDs CT-101..CT-200, all 12 categories, all lifecycle statuses`);
+console.log(`  ✓ Demonstration dataset verified: 225 reports (0 verified GPS, 207 approximate landmark, 18 unmapped), all unique IDs CT-101..CT-325, all 12 categories, all lifecycle statuses`);
 
 // Test 7: Location Selection Workflow, Marker Movement & Provenance Integrity
 console.log('Group 7: Location Selection Workflow & Coordinate Provenance Integrity');
@@ -241,7 +241,7 @@ const {
 
 // 1. User-pinned coordinate selection
 const userPinnedIssue = {
-  id: 'CT-202',
+  id: 'CT-FIXTURE-PINNED',
   title: 'Pothole on pedestrian footpath near CE block market',
   category: 'Roads and Footpaths',
   building: 'Action Area I • CB & CE Residential Blocks',
@@ -261,7 +261,7 @@ assert.equal(userPinnedCoords.source, 'Pinned on Interactive Map', 'Must preserv
 
 // 2. Verified GPS from browser geolocation
 const browserGpsIssue = {
-  id: 'CT-203',
+  id: 'CT-FIXTURE-BROWSER-GPS',
   title: 'Exposed street lighting junction box',
   category: 'Streetlights and Electricity',
   building: 'Action Area I • Nazrul Tirtha & Cultural Complex',
@@ -288,7 +288,7 @@ assert.equal(refinedCoords.lng, 88.45600, 'Refined longitude after marker drag m
 
 // 4. Missing coordinates directed to unmapped queue
 const unmappedSelectionIssue = {
-  id: 'CT-204',
+  id: 'CT-FIXTURE-UNMAPPED',
   title: 'Broken bus stop sign in perimeter sector',
   building: 'Other / Unmapped New Town Location',
   coordinates: null,

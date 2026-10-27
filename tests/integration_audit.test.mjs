@@ -518,7 +518,7 @@ runTest('validateAndParseBackupJSON Enforces Valid Data', () => {
 
 runTest('Storage Compatibility for User-Pinned and GPS Coordinates', () => {
   const userPinnedReport = {
-    id: 'CT-205',
+    id: 'CT-FIXTURE-PINNED',
     title: 'Damaged sidewalk slab with exposed rebar',
     category: 'Roads and Footpaths',
     status: 'Open',
@@ -590,14 +590,14 @@ runTest('All 9 Demo Tour Steps are Defined and Non-Destructive', () => {
 // -------------------------------------------------------------
 console.log('\nGroup 6: Dataset Expansion, ID Collision & Storage Preservation');
 
-runTest('100-Report Demonstration Dataset Integrity & Uniqueness', () => {
-  assert.strictEqual(INITIAL_ISSUES.length, 100, `INITIAL_ISSUES should contain exactly 100 records (found ${INITIAL_ISSUES.length})`);
+runTest('225-Report Demonstration Dataset Integrity & Uniqueness', () => {
+  assert.strictEqual(INITIAL_ISSUES.length, 225, `INITIAL_ISSUES should contain exactly 225 records (found ${INITIAL_ISSUES.length})`);
 
   const ids = INITIAL_ISSUES.map((i) => i.id);
   const uniqueIds = new Set(ids);
-  assert.strictEqual(uniqueIds.size, 100, 'All 100 report IDs must be unique');
+  assert.strictEqual(uniqueIds.size, 225, 'All 225 report IDs must be unique');
 
-  for (let num = 101; num <= 200; num++) {
+  for (let num = 101; num <= 325; num++) {
     assert.ok(uniqueIds.has(`CT-${num}`), `Report ID CT-${num} must exist`);
   }
 
@@ -612,14 +612,14 @@ runTest('100-Report Demonstration Dataset Integrity & Uniqueness', () => {
   const verifiedCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'verified-gps').length;
 
   assert.strictEqual(verifiedCount, 0, 'No demo records should claim verified GPS without field survey');
-  assert.strictEqual(approxCount, 92, '92 reports have approximate landmark coordinates');
-  assert.strictEqual(unmappedCount, 8, '8 reports are in the unmapped queue');
-  assert.strictEqual(approxCount + unmappedCount, 100, 'Mapped + unmapped must equal 100');
+  assert.strictEqual(approxCount, 207, '207 reports have approximate landmark coordinates');
+  assert.strictEqual(unmappedCount, 18, '18 reports are in the unmapped queue');
+  assert.strictEqual(approxCount + unmappedCount, 225, 'Mapped + unmapped must equal 225');
 });
 
-runTest('Dynamic Next-ID Generation Never Collides with 100 Records or Restored Backup', () => {
-  // With 100 default issues
-  const maxExisting100 = INITIAL_ISSUES.reduce((max, issue) => {
+runTest('Dynamic Next-ID Generation Never Collides with 225 Records or Restored Backup', () => {
+  // With 225 default issues
+  const maxExisting225 = INITIAL_ISSUES.reduce((max, issue) => {
     const match = issue.id && String(issue.id).match(/^CT-(\d+)$/i);
     if (match) {
       const num = parseInt(match[1], 10);
@@ -627,10 +627,10 @@ runTest('Dynamic Next-ID Generation Never Collides with 100 Records or Restored 
     }
     return max;
   }, 100);
-  assert.strictEqual(`CT-${maxExisting100 + 1}`, 'CT-201', 'Next ID for default 100 issues must be CT-201');
+  assert.strictEqual(`CT-${maxExisting225 + 1}`, 'CT-326', 'Next ID for default 225 issues must be CT-326');
 
   // With restored backup containing higher ID
-  const backupWithHighId = [...INITIAL_ISSUES, { id: 'CT-250', title: 'Restored issue' }];
+  const backupWithHighId = [...INITIAL_ISSUES, { id: 'CT-450', title: 'Restored issue' }];
   const maxWithBackup = backupWithHighId.reduce((max, issue) => {
     const match = issue.id && String(issue.id).match(/^CT-(\d+)$/i);
     if (match) {
@@ -639,7 +639,7 @@ runTest('Dynamic Next-ID Generation Never Collides with 100 Records or Restored 
     }
     return max;
   }, 100);
-  assert.strictEqual(`CT-${maxWithBackup + 1}`, 'CT-251', 'Next ID after restoring backup must exceed CT-250');
+  assert.strictEqual(`CT-${maxWithBackup + 1}`, 'CT-451', 'Next ID after restoring backup must exceed CT-450');
 });
 
 console.log(`\n=== AUDIT COMPLETE: ${passedTests}/${totalTests} TESTS PASSED ===\n`);
