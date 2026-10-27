@@ -322,7 +322,7 @@ export function computeHotspots(issues = []) {
       const openCount = groupIssues.filter((i) => i.status === 'Open').length;
       const overdueCount = groupIssues.filter((i) => {
         const deadline = getDeadlineStatus(i);
-        return deadline.isOverdue;
+        return deadline === 'Overdue' || Boolean(deadline?.isOverdue);
       }).length;
 
       // Top category calculation

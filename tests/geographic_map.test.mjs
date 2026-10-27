@@ -331,7 +331,34 @@ assert.ok(popupUnmapped.includes('Unmapped Queue'), 'Popup must display Unmapped
 
 console.log('  ✓ User-pinned coordinates preserved without landmark replacement');
 console.log('  ✓ Browser GPS provenance verified without false GPS claims');
-console.log('  ✓ Marker drag refinement, unmapped safety, landmark search, and popup badges verified');
+// Test 8: Geographic Distribution & Coordinate Overlap Prevention Audit
+console.log('Group 8: Geographic Distribution & Coordinate Overlap Prevention');
+const mappedPoints = new Set();
+let mappedTotal = 0;
+
+INITIAL_ISSUES.forEach((issue) => {
+  const coords = resolveIssueCoordinates(issue);
+  if (coords) {
+    mappedTotal++;
+    assert.equal(
+      isWithinNewTownBounds(coords.lat, coords.lng),
+      true,
+      `Issue ${issue.id} coordinate (${coords.lat}, ${coords.lng}) must be within New Town geographic bounds`
+    );
+    const coordKey = `${coords.lat.toFixed(4)},${coords.lng.toFixed(4)}`;
+    assert.equal(
+      mappedPoints.has(coordKey),
+      false,
+      `Issue ${issue.id} must not duplicate coordinates with another issue at ${coordKey}`
+    );
+    mappedPoints.add(coordKey);
+  }
+});
+
+assert.equal(mappedTotal, 207, 'Must have exactly 207 mapped demo reports');
+assert.equal(mappedPoints.size, 207, 'All 207 mapped demo reports must have distinct, non-overlapping coordinates');
+console.log('  ✓ All 207 mapped reports have unique, geographically distinct coordinates within New Town');
+console.log('  ✓ No artificial coordinate stacking or clustering overlap across the demonstration dataset');
 
 console.log('\n=== ALL GEOGRAPHIC MAP TESTS PASSED ===\n');
 

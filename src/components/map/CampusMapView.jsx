@@ -198,8 +198,11 @@ export default function CampusMapView({
             height="580px"
             highlightedIssueId={hoveredIssueId || selectedIssueId}
             onSelectIssue={(issue) => setSelectedIssueId(issue.id)}
-            externalFilter={activeHotspot?.landmarkName || null}
-            onResetExternalFilter={() => setSelectedHotspotId(null)}
+            externalFilter={activeHotspot?.landmarkName || (selectedCampus && selectedCampus !== 'All Action Areas' ? selectedCampus : null)}
+            onResetExternalFilter={() => {
+              setSelectedHotspotId(null);
+              onSelectCampus?.('All Action Areas');
+            }}
             onMapReady={(api) => {
               mapApiRef.current = api;
             }}

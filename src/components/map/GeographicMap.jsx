@@ -101,13 +101,14 @@ export default function GeographicMap({
         if (!matchesQuery) return false;
       }
 
-      // External filter (e.g. clicked Hotspot landmark)
-      if (externalFilter && externalFilter !== 'ALL') {
+      // External filter (e.g. clicked Hotspot landmark or selected Action Area)
+      if (externalFilter && externalFilter !== 'ALL' && externalFilter !== 'All Action Areas') {
         const ext = externalFilter.toLowerCase();
         const loc = (issue.location || '').toLowerCase();
         const bldg = (issue.building || '').toLowerCase();
         const area = (issue.area || '').toLowerCase();
-        if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext)) {
+        const campus = (issue.campus || '').toLowerCase();
+        if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext) && !campus.includes(ext)) {
           return false;
         }
       }
@@ -156,7 +157,7 @@ export default function GeographicMap({
     statusFilter !== 'ALL' ||
     priorityFilter !== 'ALL' ||
     unresolvedOnly ||
-    Boolean(externalFilter);
+    Boolean(externalFilter && externalFilter !== 'ALL' && externalFilter !== 'All Action Areas');
 
   const handleResetFilters = useCallback(() => {
     setSearchQuery('');
@@ -169,7 +170,35 @@ export default function GeographicMap({
     }
   }, [onResetExternalFilter]);
 
-  // Initialize Leaflet Map
+  // Track initial bounds fitting to avoid fighting user pan/zoom
+  const hasFittedInitialBoundsRef = useRef(false);
+
+  // Automatically fit map bounds to the full New Town demo dataset on initial load
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || hasFittedInitialBoundsRef.current || visibleMappedIssues.length === 0) return;
+
+    const bounds = L.latLngBounds(visibleMappedIssues.map((m) => [m.lat, m.lng]));
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, {
+        padding: [24, 24],
+        maxZoom: 14,
+      });
+      hasFittedInitialBoundsRef.current = true;
+    }
+  }, [visibleMappedIssues]);
+
+  // If external filter changes (e.g. clicked a specific Hotspot or Action Area), smoothly fit bounds to it
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !externalFilter || externalFilter === 'ALL' || externalFilter === 'All Action Areas') return;
+    if (visibleMappedIssues.length > 0) {
+      const bounds = L.latLngBounds(visibleMappedIssues.map((m) => [m.lat, m.lng]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+      }
+    }
+  }, [externalFilter, visibleMappedIssues]);
   useEffect(() => {
     if (!mapContainerRef.current) return;
     if (mapInstanceRef.current) return;
@@ -297,7 +326,25 @@ export default function GeographicMap({
     if (visibleMappedIssues.length === 0) return;
 
     const currentZoom = map.getZoom();
-    const clusterDistanceThreshold = 40; // pixel distance to cluster
+
+    // Responsive spatial clustering threshold based on zoom level:
+    // At zoom >= 16: completely unclustered, every issue rendered as an individual marker
+    // At zoom 15: narrow threshold (10px) to separate individual streets
+    // At zoom 14: moderate threshold (18px) to separate sub-neighborhoods
+    // At zoom 13: 24px (instead of previous 40px) so distinct landmarks and corridors appear across New Town
+    // At zoom <= 12: 32px for township regional overview
+    let clusterThreshold;
+    if (currentZoom >= 16) {
+      clusterThreshold = 0; // Show all individual markers
+    } else if (currentZoom === 15) {
+      clusterThreshold = 10;
+    } else if (currentZoom === 14) {
+      clusterThreshold = 18;
+    } else if (currentZoom === 13) {
+      clusterThreshold = 24;
+    } else {
+      clusterThreshold = 32;
+    }
 
     // Cluster points spatially
     const clusters = [];
@@ -311,18 +358,17 @@ export default function GeographicMap({
       const pt1 = map.latLngToContainerPoint([p1.lat, p1.lng]);
       const clusterItems = [p1];
 
-      // At zoom >= 16, do not cluster different locations unless coordinates are identical (< 6px)
-      const threshold = currentZoom >= 16 ? 6 : clusterDistanceThreshold;
+      if (clusterThreshold > 0) {
+        for (let j = i + 1; j < visibleMappedIssues.length; j++) {
+          if (visited.has(j)) continue;
+          const p2 = visibleMappedIssues[j];
+          const pt2 = map.latLngToContainerPoint([p2.lat, p2.lng]);
+          const dist = Math.hypot(pt1.x - pt2.x, pt1.y - pt2.y);
 
-      for (let j = i + 1; j < visibleMappedIssues.length; j++) {
-        if (visited.has(j)) continue;
-        const p2 = visibleMappedIssues[j];
-        const pt2 = map.latLngToContainerPoint([p2.lat, p2.lng]);
-        const dist = Math.hypot(pt1.x - pt2.x, pt1.y - pt2.y);
-
-        if (dist < threshold) {
-          visited.add(j);
-          clusterItems.push(p2);
+          if (dist < clusterThreshold) {
+            visited.add(j);
+            clusterItems.push(p2);
+          }
         }
       }
 
@@ -344,6 +390,17 @@ export default function GeographicMap({
       }
     }
 
+    // Detect identical coordinates among individual markers for visual spiderfy
+    const coordUsage = new Map();
+    clusters.forEach((cl) => {
+      if (!cl.isCluster) {
+        const key = cl.item.lat.toFixed(5) + ',' + cl.item.lng.toFixed(5);
+        coordUsage.set(key, (coordUsage.get(key) || 0) + 1);
+      }
+    });
+
+    const coordIndex = new Map();
+
     // Render markers and clusters
     clusters.forEach((cl) => {
       if (cl.isCluster) {
@@ -357,15 +414,19 @@ export default function GeographicMap({
         });
 
         clusterMarker.on('click', () => {
-          // If all items have the same coordinates, open popup for the list
-          const firstLat = cl.items[0].lat;
-          const firstLng = cl.items[0].lng;
-          const allSame = cl.items.every(
-            (it) => Math.abs(it.lat - firstLat) < 0.0001 && Math.abs(it.lng - firstLng) < 0.0001
-          );
+          const bounds = L.latLngBounds(cl.items.map((it) => [it.lat, it.lng]));
+          if (bounds.isValid() && currentZoom < 16) {
+            const spanLat = bounds.getNorth() - bounds.getSouth();
+            const spanLng = bounds.getEast() - bounds.getWest();
 
-          if (allSame || currentZoom >= 17) {
-            // Open popup list of issues at this exact spot
+            if (spanLat < 0.0003 && spanLng < 0.0003) {
+              // Zoom directly in to level 16 to reveal all individual markers
+              map.setView([cl.lat, cl.lng], Math.min(16, currentZoom + 2), { animate: true });
+            } else {
+              map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+            }
+          } else {
+            // Open popup list of issues in this cluster
             const popupHtml = `
               <div class="text-left font-sans text-slate-800" style="min-width: 250px; max-width: 300px;">
                 <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
@@ -401,10 +462,6 @@ export default function GeographicMap({
               </div>
             `;
             clusterMarker.bindPopup(popupHtml, { className: 'civic-leaflet-popup' }).openPopup();
-          } else {
-            // Zoom into cluster bounds
-            const bounds = L.latLngBounds(cl.items.map((it) => [it.lat, it.lng]));
-            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
           }
         });
 
@@ -414,7 +471,23 @@ export default function GeographicMap({
         const { issue, lat, lng, isExact } = cl.item;
         const isSelected = highlightedIssueId === issue.id;
 
-        const marker = L.marker([lat, lng], {
+        // Deterministic micro-separation if multiple individual markers share the exact same spot
+        const key = lat.toFixed(5) + ',' + lng.toFixed(5);
+        const totalAtCoord = coordUsage.get(key) || 1;
+        let renderedLat = lat;
+        let renderedLng = lng;
+
+        if (totalAtCoord > 1) {
+          const idx = coordIndex.get(key) || 0;
+          coordIndex.set(key, idx + 1);
+          // Radial spiderfy displacement (approx 12-15 meters)
+          const angle = (2 * Math.PI * idx) / totalAtCoord;
+          const radius = 0.00012; // ~13 meters
+          renderedLat = lat + radius * Math.cos(angle);
+          renderedLng = lng + radius * Math.sin(angle);
+        }
+
+        const marker = L.marker([renderedLat, renderedLng], {
           icon: createCustomMarkerIcon(issue, isSelected),
           riseOnHover: true,
         });
@@ -444,12 +517,20 @@ export default function GeographicMap({
     });
   }, [visibleMappedIssues, activeZoom, highlightedIssueId, onSelectIssue, onOpenIssueDetail]);
 
-  // Recenter map
-  const handleRecenter = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo(NEW_TOWN_MAP_CENTER, 13, { duration: 0.8 });
+  // Recenter map: fits full New Town dataset bounds
+  const handleRecenter = useCallback(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (visibleMappedIssues.length > 0) {
+      const bounds = L.latLngBounds(visibleMappedIssues.map((m) => [m.lat, m.lng]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [24, 24], maxZoom: 14 });
+        return;
+      }
     }
-  };
+    map.flyTo(NEW_TOWN_MAP_CENTER, 13, { duration: 0.8 });
+  }, [visibleMappedIssues]);
 
   // Fullscreen toggle
   const toggleFullscreen = () => {
@@ -493,6 +574,25 @@ export default function GeographicMap({
 
       {/* 2. Floating Top-Left Search and Filter Panel */}
       <div className="absolute top-3 left-3 z-10 max-w-sm sm:max-w-md w-[calc(100%-1.5rem)] pointer-events-auto space-y-2">
+        {/* Dataset visibility badge & active filters reset bar */}
+        <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-md shadow-2xs border border-slate-200/80 text-[11px] text-slate-600">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span className="font-medium text-slate-700 truncate">
+              Showing <strong>{visibleMappedIssues.length}</strong> of {mappedIssues.length} mapped reports
+            </span>
+          </div>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-emerald-700 hover:text-emerald-900 font-semibold text-[11px] underline shrink-0 cursor-pointer"
+            >
+              Reset all
+            </button>
+          )}
+        </div>
+
         {/* Search Bar + Quick Actions */}
         <div className="bg-white/95 backdrop-blur-md rounded-lg shadow-sm border border-slate-200/80 p-1.5 flex items-center gap-1.5">
           <div className="relative flex-1">
