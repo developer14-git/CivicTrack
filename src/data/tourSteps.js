@@ -1,0 +1,167 @@
+import {
+  LayoutDashboard,
+  FilePlus,
+  Compass,
+  MapPin,
+  Wrench,
+  ShieldCheck,
+  AlertTriangle,
+  BarChart3,
+  HardDrive,
+} from 'lucide-react';
+
+export const TOUR_STEPS = [
+  {
+    id: 'overview',
+    number: 1,
+    tag: 'Civic Dashboard',
+    title: 'New Town Civic Dashboard & Live Metrics',
+    icon: LayoutDashboard,
+    iconColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    description:
+      'CivicTrack unifies civic issue reporting, municipal field dispatch, and verified resolution across New Town, Kolkata into transparent real-time metrics. The top cards reflect live operational health across all active Action Areas.',
+    insights: [
+      'Four interactive summary figures filter civic reports across Open, In Progress, Submitted, and Verified.',
+      'Recent activity feed records full municipal audit events in real time without page reloads or remote latency.',
+    ],
+    targetTab: 'overview',
+    actionText: 'Reset View to Overview',
+    actionKey: 'nav_overview',
+  },
+  {
+    id: 'report',
+    number: 2,
+    tag: 'Civic Report Intake & SLAs',
+    title: 'Standardized Report Intake & Target SLAs',
+    icon: FilePlus,
+    iconColor: 'text-sky-700 bg-sky-50 border-sky-200',
+    description:
+      'Citizens report damage across 12 public infrastructure categories (Roads, Streetlights, Drainage, Parks, Public Buildings, Waste, Traffic Safety, Water Supply, Storm Damage, Vandalism, Construction, and more) with Action Area landmarks and optional verified GPS coordinates.',
+    insights: [
+      'SLA Policies: High Priority (24 hours), Medium Priority (72 hours), and Low Priority (7 days).',
+      'Dynamic countdown timers compute remaining time live and trigger Overdue warnings when breached.',
+    ],
+    targetTab: 'overview',
+    actionText: 'Open Report Form',
+    actionKey: 'open_report',
+  },
+  {
+    id: 'duplicate',
+    number: 3,
+    tag: 'Deduplication Engine',
+    title: 'Client-Side Duplicate Detection & Endorsements',
+    icon: Compass,
+    iconColor: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+    description:
+      'When drafting a report, CivicTrack compares title, category, and location coordinates against in-memory records. Citizens are alerted to existing reports and can endorse them instead of creating duplicate clutter.',
+    insights: [
+      'One-click "Support Existing Report" consolidates resident demand and boosts issue priority.',
+      'Single-vote integrity prevents spam and provides authentic crowd-sourced urgency for field operations.',
+    ],
+    targetTab: 'overview',
+    actionText: 'Load Water Leak in Form',
+    actionKey: 'load_duplicate_demo',
+  },
+  {
+    id: 'map',
+    number: 4,
+    tag: 'Spatial Awareness',
+    title: 'Interactive New Town Geographic Map',
+    icon: MapPin,
+    iconColor: 'text-teal-700 bg-teal-50 border-teal-200',
+    description:
+      'An interactive Leaflet map with OpenStreetMap tiles displays public infrastructure damage across New Town Action Areas I, II, III, Eco Park, and major connecting corridors with honest location precision.',
+    insights: [
+      'Interactive cluster pins group issues at lower zoom levels and expand when clicked.',
+      'Status-based pin colors distinguish Open (amber), In Progress (blue), Verification (purple), and Resolved (green).',
+    ],
+    targetTab: 'map',
+    actionText: 'Navigate to Explore Map',
+    actionKey: 'nav_map',
+  },
+  {
+    id: 'staff',
+    number: 5,
+    tag: 'Field Operations',
+    title: 'Demo Staff Mode & Work Order Dispatch',
+    icon: Wrench,
+    iconColor: 'text-amber-700 bg-amber-50 border-amber-200',
+    description:
+      'Activating Demo Staff Mode simulates the municipal physical operations workflow. Field crews accept open work orders, move tickets to "In Progress", and submit repair logs with completion notes and after-photos.',
+    insights: [
+      'Crucial distinction: Field staff advance tickets to "Resolution Submitted", never directly to "Resolved".',
+      'All maintenance notes and dispatched technician credentials are logged permanently in the public audit timeline.',
+    ],
+    targetTab: 'issues',
+    actionText: 'Inspect Ticket CT-103 in Staff Mode',
+    actionKey: 'inspect_staff_ticket',
+  },
+  {
+    id: 'verify',
+    number: 6,
+    tag: 'Two-Stage Oversight',
+    title: 'Independent Verification Workflow',
+    icon: ShieldCheck,
+    iconColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    description:
+      'CivicTrack prohibits self-closure. Once maintenance submits a proposed fix, an independent citizen verifier or civic auditor must inspect the site and either verify closure or reject it back for rework.',
+    insights: [
+      'Ticket CT-102 (Biswa Bangla Gate Pipeline Leak) is in "Resolution Submitted" awaiting verification.',
+      'Clicking "Reject & Request Rework" returns the ticket to In Progress, enforcing technician accountability.',
+    ],
+    targetTab: 'issues',
+    actionText: 'Inspect CT-102 Verifier Decision Panel',
+    actionKey: 'inspect_submitted_ticket',
+  },
+  {
+    id: 'challenge',
+    number: 7,
+    tag: 'Citizen Accountability',
+    title: 'Citizen Challenges & Anti-Superficial Closure',
+    icon: AlertTriangle,
+    iconColor: 'text-rose-700 bg-rose-50 border-rose-200',
+    description:
+      'If a repair fails shortly after completion or is resolved superficially, any citizen can file a formal "Citizen Challenge" with structured reason codes (e.g. Problem Persists, Safety Hazard, Incomplete Cleanup).',
+    insights: [
+      'Challenged tickets are highlighted across the dashboard and require managerial re-evaluation.',
+      'Public audit history preserves every citizen challenge to prevent repeat failures from being swept under the rug.',
+    ],
+    targetTab: 'issues',
+    actionText: 'Inspect CT-102 Challenge Option',
+    actionKey: 'inspect_challenge_ticket',
+  },
+  {
+    id: 'analytics',
+    number: 8,
+    tag: 'Operational Intelligence',
+    title: 'Accountability Analytics & SLA Performance',
+    icon: BarChart3,
+    iconColor: 'text-blue-700 bg-blue-50 border-blue-200',
+    description:
+      'Accountability Analytics offers community residents and municipal planners transparent oversight. It separates raw submitted repairs from independently verified ones and computes true median resolution times.',
+    insights: [
+      'Dedicated Overdue Issues queue isolates tickets that have exceeded their target SLA deadlines.',
+      'Resolution outcome charts expose rejection and challenge rates across New Town Action Areas.',
+    ],
+    targetTab: 'analytics',
+    actionText: 'Navigate to Analytics View',
+    actionKey: 'nav_analytics',
+  },
+  {
+    id: 'storage',
+    number: 9,
+    tag: 'Local Persistence & Privacy',
+    title: 'Zero-Backend Local Durability & JSON Backups',
+    icon: HardDrive,
+    iconColor: 'text-purple-700 bg-purple-50 border-purple-200',
+    description:
+      'CivicTrack persists all demo tickets, verification events, and endorsements inside the browser using hardened localStorage. Evaluators can export JSON backups, restore test datasets, or cleanly reset to defaults.',
+    insights: [
+      'Large base64 photo data is bounded safely to prevent browser storage exhaustion while preserving in-session previews.',
+      'Privacy-first guarantee: No authentication tokens or citizen data are sent to external cloud servers.',
+    ],
+    targetTab: 'overview',
+    actionText: 'Open Data & Backup Modal',
+    actionKey: 'open_storage_modal',
+  },
+];

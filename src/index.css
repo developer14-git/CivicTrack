@@ -1,0 +1,41 @@
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Custom Leaflet popup & marker styling */
+.civic-leaflet-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.civic-leaflet-popup .leaflet-popup-content {
+  margin: 0.75rem;
+  line-height: 1.4;
+}
+
+.civic-leaflet-popup .leaflet-popup-tip-container {
+  overflow: visible;
+}
+
+.civic-leaflet-popup .leaflet-popup-close-button {
+  top: 6px;
+  right: 6px;
+  color: #64748b;
+  font-size: 16px;
+  padding: 2px;
+}
+
+.civic-leaflet-popup .leaflet-popup-close-button:hover {
+  color: #0f172a;
+}
