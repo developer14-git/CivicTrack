@@ -773,7 +773,7 @@ export default function LocationPicker({
       <div className="flex items-center justify-between text-[11px] text-slate-600 px-0.5">
         <div className="flex items-center gap-1.5 font-medium text-slate-700">
           <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-          <span>Click the map to mark the damage location, or drag the pin.</span>
+          <span>Click the map or drag the pin to mark the exact location.</span>
         </div>
         {coordinates?.lat && coordinates?.lng && (
           <button
@@ -791,7 +791,7 @@ export default function LocationPicker({
       <div className="relative rounded-xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100">
         <div
           ref={mapContainerRef}
-          className="w-full h-[250px] sm:h-[280px] z-0 outline-none rounded-xl"
+          className="w-full h-[230px] sm:h-[285px] md:h-[315px] z-0 outline-none rounded-xl"
           style={{ touchAction: 'none' }}
           tabIndex={0}
         />
@@ -800,7 +800,7 @@ export default function LocationPicker({
         <div className="absolute bottom-2 left-2 right-2 pointer-events-none z-10 flex items-center justify-between">
           <div className="bg-slate-900/85 backdrop-blur-xs text-white text-[10px] px-2.5 py-1 rounded-md shadow-sm pointer-events-auto flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Click map or drag pin to mark the exact damage spot</span>
+            <span>Click the map or drag the pin to mark the exact location.</span>
           </div>
         </div>
       </div>
