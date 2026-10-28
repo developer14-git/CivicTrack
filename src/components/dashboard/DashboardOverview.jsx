@@ -12,13 +12,13 @@ import {
   Wrench,
   Clock,
   ShieldCheck,
-  Layers,
 } from 'lucide-react';
 import StatusBadge from '../common/StatusBadge';
 import PriorityBadge from '../common/PriorityBadge';
 import GeographicMap from '../map/GeographicMap';
+import CategoryDistributionChart from './CategoryDistributionChart';
 import { computeHotspots } from '../../utils/mapUtils';
-import { resolveIssueCoordinates, CATEGORIES } from '../../data/mockIssues';
+import { resolveIssueCoordinates } from '../../data/mockIssues';
 
 /**
  * Calculates a short human-readable age from an ISO timestamp.
@@ -79,18 +79,6 @@ export default function DashboardOverview({
   ).length;
   const verifiedResolvedCount = issues.filter((i) => i.status === 'Resolved').length;
 
-  // Category statistics breakdown dynamically calculated from actual reports across the 12 civic categories
-  const categoryStats = useMemo(() => {
-    const counts = {};
-    issues.forEach((i) => {
-      counts[i.category] = (counts[i.category] || 0) + 1;
-    });
-    return CATEGORIES.filter((cat) => cat !== 'All').map((cat) => ({
-      name: cat,
-      count: counts[cat] || 0,
-      percentage: issues.length > 0 ? Math.round(((counts[cat] || 0) / issues.length) * 100) : 0,
-    })).sort((a, b) => b.count - a.count);
-  }, [issues]);
 
   // Short list of recent reports sorted by activity
   const recentReports = useMemo(() => {
@@ -391,56 +379,12 @@ export default function DashboardOverview({
         </div>
       </section>
 
-      {/* 4. Compact Category Statistics Section */}
-      <section aria-label="Category Breakdown" className="space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-200/90">
-          <div>
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-emerald-700" />
-              <h2 className="text-base font-bold text-slate-900">Issues by Category</h2>
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Infrastructure complaint distribution across 12 civic categories in New Town
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onViewAllIssues && onViewAllIssues('All')}
-            className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer transition-colors"
-          >
-            <span>Filter categories</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-          {categoryStats.slice(0, 12).map((cat) => (
-            <button
-              key={cat.name}
-              type="button"
-              onClick={() => onViewAllIssues && onViewAllIssues(cat.name)}
-              className="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group flex flex-col justify-between"
-            >
-              <div className="text-xs font-semibold text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2 leading-snug">
-                {cat.name}
-              </div>
-              <div className="mt-2.5 flex items-baseline justify-between">
-                <span className="text-base font-extrabold text-slate-900 leading-none">
-                  {cat.count}
-                </span>
-                <span className="text-[10px] font-semibold text-slate-400">
-                  {cat.percentage}%
-                </span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-1 mt-1.5 overflow-hidden">
-                <div
-                  className="bg-emerald-600 h-1 rounded-full transition-all"
-                  style={{ width: `${Math.min(100, Math.max(8, cat.percentage * 2))}%` }}
-                />
-              </div>
-            </button>
-          ))}
-        </div>
+      {/* 4. Interactive Category Distribution Donut Chart */}
+      <section aria-label="Category Distribution Visualization">
+        <CategoryDistributionChart
+          issues={issues}
+          onViewAllIssues={onViewAllIssues}
+        />
       </section>
 
       {/* 5. Recent Reports Section */}
