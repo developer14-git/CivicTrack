@@ -14,115 +14,126 @@ import {
   Layers,
   PieChart as PieChartIcon,
   ArrowRight,
-  RotateCcw,
-  Check,
-  Filter,
+  TrendingUp,
 } from 'lucide-react';
 import { CATEGORIES } from '../../data/mockIssues';
 
-// Elegant emerald, teal, and muted slate palette complementing CivicTrack's theme
+// 12 vibrant, harmonious colors with soft gradient pairs and subtle accents
 const CATEGORY_COLOR_PALETTE = {
   'Roads and Footpaths': {
-    primary: '#047857', // Deep Emerald 700
-    hover: '#065f46',
+    primary: '#059669', // Emerald
+    gradientStart: '#10b981',
+    gradientEnd: '#047857',
     tint: '#ecfdf5',
     text: '#065f46',
     border: '#a7f3d0',
     icon: Road,
   },
   'Streetlights and Electricity': {
-    primary: '#0d9488', // Teal 600
-    hover: '#0f766e',
-    tint: '#f0fdfa',
-    text: '#115e59',
-    border: '#99f6e4',
+    primary: '#f59e0b', // Amber / Gold
+    gradientStart: '#fbbf24',
+    gradientEnd: '#d97706',
+    tint: '#fefce8',
+    text: '#854d0e',
+    border: '#fde047',
     icon: Zap,
   },
   'Drainage and Flooding': {
-    primary: '#0284c7', // Sky-Teal 600
-    hover: '#0369a1',
+    primary: '#0284c7', // Sky / Cyan
+    gradientStart: '#38bdf8',
+    gradientEnd: '#0369a1',
     tint: '#f0f9ff',
     text: '#075985',
     border: '#bae6fd',
     icon: Droplets,
   },
   'Public Parks and Green Spaces': {
-    primary: '#10b981', // Emerald 500 / Mint
-    hover: '#059669',
-    tint: '#ecfdf5',
-    text: '#047857',
-    border: '#6ee7b7',
+    primary: '#84cc16', // Lime / Vibrant Green
+    gradientStart: '#a3e635',
+    gradientEnd: '#65a30d',
+    tint: '#f7fee7',
+    text: '#3f6212',
+    border: '#d9f99d',
     icon: Trees,
   },
   'Public Buildings and Facilities': {
-    primary: '#334155', // Slate 700 / Deep Slate
-    hover: '#1e293b',
-    tint: '#f8fafc',
-    text: '#1e293b',
-    border: '#cbd5e1',
+    primary: '#6366f1', // Indigo
+    gradientStart: '#818cf8',
+    gradientEnd: '#4f46e5',
+    tint: '#eef2ff',
+    text: '#3730a3',
+    border: '#c7d2fe',
     icon: Building2,
   },
   'Waste and Cleanliness': {
-    primary: '#0f766e', // Deep Teal 700
-    hover: '#115e59',
-    tint: '#f0fdfa',
-    text: '#134e4a',
-    border: '#5eead4',
+    primary: '#f97316', // Coral / Orange
+    gradientStart: '#fb923c',
+    gradientEnd: '#ea580c',
+    tint: '#fff7ed',
+    text: '#9a3412',
+    border: '#fed7aa',
     icon: Trash2,
   },
   'Traffic and Pedestrian Safety': {
-    primary: '#059669', // Classic Emerald 600
-    hover: '#047857',
-    tint: '#ecfdf5',
-    text: '#065f46',
-    border: '#a7f3d0',
+    primary: '#ef4444', // Crimson / Red
+    gradientStart: '#f87171',
+    gradientEnd: '#dc2626',
+    tint: '#fef2f2',
+    text: '#991b1b',
+    border: '#fecaca',
     icon: AlertTriangle,
   },
   'Water Supply': {
-    primary: '#0891b2', // Cyan-Teal 600
-    hover: '#0e7490',
-    tint: '#ecfeff',
-    text: '#155e75',
-    border: '#a5f3fc',
+    primary: '#0d9488', // Deep Teal
+    gradientStart: '#2dd4bf',
+    gradientEnd: '#0f766e',
+    tint: '#f0fdfa',
+    text: '#115e59',
+    border: '#99f6e4',
     icon: Wrench,
   },
   'Storm and Natural Damage': {
-    primary: '#475569', // Muted Slate 600
-    hover: '#334155',
-    tint: '#f1f5f9',
-    text: '#334155',
-    border: '#cbd5e1',
+    primary: '#8b5cf6', // Violet
+    gradientStart: '#a78bfa',
+    gradientEnd: '#7c3aed',
+    tint: '#f5f3ff',
+    text: '#5b21b6',
+    border: '#ddd6fe',
     icon: CloudRain,
   },
   'Public Property Vandalism': {
-    primary: '#64748b', // Slate 500
-    hover: '#475569',
-    tint: '#f8fafc',
-    text: '#475569',
-    border: '#e2e8f0',
+    primary: '#ec4899', // Pink
+    gradientStart: '#f472b6',
+    gradientEnd: '#db2777',
+    tint: '#fdf2f8',
+    text: '#9d174d',
+    border: '#fbcfe8',
     icon: ShieldAlert,
   },
   'Construction and Roadwork': {
-    primary: '#14b8a6', // Bright Teal 500
-    hover: '#0d9488',
-    tint: '#f0fdfa',
-    text: '#0f766e',
-    border: '#99f6e4',
+    primary: '#d97706', // Ochre / Warm Gold
+    gradientStart: '#fbbf24',
+    gradientEnd: '#b45309',
+    tint: '#fffbeb',
+    text: '#92400e',
+    border: '#fde68a',
     icon: HardHat,
   },
   'Other Public Infrastructure': {
-    primary: '#94a3b8', // Muted Slate 400
-    hover: '#64748b',
+    primary: '#64748b', // Slate Blue
+    gradientStart: '#94a3b8',
+    gradientEnd: '#475569',
     tint: '#f8fafc',
-    text: '#64748b',
-    border: '#e2e8f0',
+    text: '#334155',
+    border: '#cbd5e1',
     icon: Layers,
   },
 };
 
 const FALLBACK_STYLE = {
   primary: '#10b981',
-  hover: '#059669',
+  gradientStart: '#34d399',
+  gradientEnd: '#059669',
   tint: '#ecfdf5',
   text: '#065f46',
   border: '#a7f3d0',
@@ -162,15 +173,11 @@ export default function CategoryDistributionChart({
   onSelectCategory,
 }) {
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [localFilter, setLocalFilter] = useState('All');
   const [tooltipState, setTooltipState] = useState({ visible: false, x: 0, y: 0, data: null });
   const containerRef = useRef(null);
 
-  const effectiveSelectedCategory =
-    selectedCategory && selectedCategory !== 'All' ? selectedCategory : localFilter;
-
   // 1. Dynamic derivation of category counts and percentages from real issues
-  const { categoryStats, totalCount, topCategory } = useMemo(() => {
+  const { categoryStats, totalCount, maxCount } = useMemo(() => {
     const total = issues.length;
     const counts = {};
 
@@ -201,18 +208,20 @@ export default function CategoryDistributionChart({
     // Sort descending by count for clean visualization
     stats.sort((a, b) => b.count - a.count);
 
+    const highestCount = stats.length > 0 ? stats[0].count : 0;
+
     return {
       categoryStats: stats,
       totalCount: total,
-      topCategory: stats[0] || null,
+      maxCount: highestCount,
     };
   }, [issues]);
 
-  // 2. Compute donut slices
+  // 2. Compute donut slices with subtle gaps and radial translate vector
   const { slices, cx, cy, innerR } = useMemo(() => {
-    const center = 150;
-    const rIn = 82;
-    const rOut = 126;
+    const center = 160;
+    const rIn = 92;
+    const rOut = 138;
 
     if (totalCount === 0) {
       return { slices: [], cx: center, cy: center, innerR: rIn };
@@ -220,11 +229,11 @@ export default function CategoryDistributionChart({
 
     let currentAngle = -Math.PI / 2; // Start at 12 o'clock
     const totalSlices = categoryStats.filter((s) => s.count > 0).length;
-    const gapAngle = totalSlices > 1 ? 0.024 : 0; // ~1.4deg clean segment gap
+    const gapAngle = totalSlices > 1 ? 0.022 : 0; // Clean segment gap (~1.25 deg)
 
     const computed = categoryStats
       .filter((cat) => cat.count > 0)
-      .map((cat) => {
+      .map((cat, idx) => {
         const sliceAngle = (cat.count / totalCount) * 2 * Math.PI;
         const startAngle = currentAngle;
         const endAngle = currentAngle + sliceAngle;
@@ -235,8 +244,8 @@ export default function CategoryDistributionChart({
 
         const pathD = describeDonutArc(center, center, rIn, rOut, safeStart, safeEnd);
 
-        // Precompute slight radial translate for hover / active focus
-        const popDistance = 5;
+        // Precompute slight radial translate for hover focus
+        const popDistance = 6;
         const popX = Math.cos(midAngle) * popDistance;
         const popY = Math.sin(midAngle) * popDistance;
 
@@ -244,6 +253,7 @@ export default function CategoryDistributionChart({
 
         return {
           ...cat,
+          id: `cat-slice-${idx}`,
           startAngle,
           endAngle,
           midAngle,
@@ -253,7 +263,7 @@ export default function CategoryDistributionChart({
         };
       });
 
-    return { slices: computed, cx: center, cy: center, innerR: rIn, outerR: rOut };
+    return { slices: computed, cx: center, cy: center, innerR: rIn };
   }, [categoryStats, totalCount]);
 
   // Handle segment and legend click: filter the existing Issue Browser
@@ -268,31 +278,16 @@ export default function CategoryDistributionChart({
     [onViewAllIssues, onSelectCategory]
   );
 
-  const handleResetFilter = useCallback(() => {
-    setLocalFilter('All');
-    if (onSelectCategory) onSelectCategory('All');
-    if (onViewAllIssues) onViewAllIssues('All');
-  }, [onSelectCategory, onViewAllIssues]);
-
-  const handleNavigateToIssueBrowser = useCallback(
-    (catName) => {
-      if (onViewAllIssues) {
-        onViewAllIssues(catName || effectiveSelectedCategory || 'All');
-      }
-    },
-    [onViewAllIssues, effectiveSelectedCategory]
-  );
-
   // Active focus item for center donut display
   const activeFocusItem = useMemo(() => {
     if (hoveredCategory) {
       return categoryStats.find((c) => c.name === hoveredCategory) || null;
     }
-    if (effectiveSelectedCategory !== 'All') {
-      return categoryStats.find((c) => c.name === effectiveSelectedCategory) || null;
+    if (selectedCategory && selectedCategory !== 'All') {
+      return categoryStats.find((c) => c.name === selectedCategory) || null;
     }
     return null;
-  }, [hoveredCategory, effectiveSelectedCategory, categoryStats]);
+  }, [hoveredCategory, selectedCategory, categoryStats]);
 
   // Handle mouse move for interactive floating tooltip
   const handleMouseMove = useCallback((e, cat) => {
@@ -314,75 +309,97 @@ export default function CategoryDistributionChart({
   return (
     <div
       ref={containerRef}
-      className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6 relative text-left"
+      className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.05),0_1px_3px_0_rgba(15,23,42,0.03)] p-5 sm:p-7 space-y-6 text-left overflow-hidden"
     >
-      {/* 1. Header with Title & Reset Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0">
-              <PieChartIcon className="w-4 h-4" aria-hidden="true" />
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+      {/* Subtle, refined background texture and light gradient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(#cbd5e1_0.75px,transparent_0.75px)] [background-size:16px_16px]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-gradient-to-br from-emerald-100/35 via-teal-100/20 to-transparent blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-gradient-to-tl from-cyan-100/35 via-indigo-100/20 to-transparent blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* 1. Header with Title & Action */}
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-700 border border-emerald-200/90 flex items-center justify-center shrink-0 shadow-2xs">
+            <PieChartIcon className="w-4 h-4" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
               Issues by Category
             </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Infrastructure complaint distribution across 12 civic categories in New Town
+            </p>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Real-time complaint distribution across all 12 public infrastructure categories in New Town
-          </p>
         </div>
 
-        {/* Quick Filter Control */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {effectiveSelectedCategory !== 'All' ? (
-            <button
-              type="button"
-              onClick={handleResetFilter}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
-            >
-              <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>Reset filter ({effectiveSelectedCategory})</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleNavigateToIssueBrowser('All')}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer"
-            >
-              <span>Explore in Issue Browser</span>
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </button>
-          )}
-        </div>
+        {/* Action Link: Explore in Issue Browser with subtle arrow animation */}
+        <button
+          type="button"
+          onClick={() => onViewAllIssues && onViewAllIssues('All')}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group cursor-pointer self-start sm:self-auto px-3 py-1.5 rounded-lg hover:bg-emerald-50/80 border border-transparent hover:border-emerald-200/60"
+        >
+          <span>Explore in Issue Browser</span>
+          <ArrowRight
+            className="w-3.5 h-3.5 text-emerald-600 transition-transform duration-200 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </button>
       </div>
 
+      {/* Subtle divider accent below header */}
+      <div className="h-px w-full bg-gradient-to-r from-emerald-500/30 via-slate-200/80 to-transparent mb-5" aria-hidden="true" />
+
       {/* 2. Main Donut Chart & Legend Presentation */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left Column: Interactive Donut Chart */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-          <div className="relative w-[280px] h-[280px] sm:w-[300px] sm:h-[300px] flex items-center justify-center">
+          <div className="relative w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] flex items-center justify-center">
             {totalCount > 0 ? (
               <svg
-                viewBox="0 0 300 300"
-                className="w-full h-full transform transition-transform duration-300"
+                viewBox="0 0 320 320"
+                className="w-full h-full transform transition-transform duration-300 motion-reduce:transition-none"
                 role="img"
                 aria-label={`Donut chart representing ${totalCount} reports across 12 civic categories`}
               >
                 <defs>
-                  {/* Subtle inner shadow filter for depth */}
-                  <filter id="donut-shadow" x="-10%" y="-10%" width="120%" height="120%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.08" />
+                  {/* Soft depth shadow filter */}
+                  <filter id="donut-soft-shadow" x="-15%" y="-15%" width="130%" height="130%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.08" floodColor="#0f172a" />
                   </filter>
+
+                  {/* Tasteful segment linear gradients for depth */}
+                  {slices.map((slice) => (
+                    <linearGradient
+                      key={`grad-${slice.id}`}
+                      id={`grad-${slice.id}`}
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor={slice.style.gradientStart} />
+                      <stop offset="100%" stopColor={slice.style.gradientEnd} />
+                    </linearGradient>
+                  ))}
                 </defs>
 
-                {/* Slices */}
-                <g filter="url(#donut-shadow)">
+                {/* Slices Group with soft shadow */}
+                <g filter="url(#donut-soft-shadow)">
                   {slices.map((slice) => {
                     const isHovered = hoveredCategory === slice.name;
-                    const isSelected = effectiveSelectedCategory === slice.name;
+                    const isSelected = selectedCategory === slice.name;
                     const isDimmed =
                       (hoveredCategory && !isHovered) ||
-                      (effectiveSelectedCategory !== 'All' && !isSelected && !hoveredCategory);
+                      (selectedCategory !== 'All' && !isSelected && !hoveredCategory);
 
                     const transformStyle =
                       isHovered || isSelected
@@ -393,15 +410,15 @@ export default function CategoryDistributionChart({
                       <path
                         key={slice.name}
                         d={slice.pathD}
-                        fill={slice.style.primary}
+                        fill={`url(#grad-${slice.id})`}
                         style={{
                           transform: transformStyle,
                           transition:
-                            'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, filter 0.2s ease',
-                          opacity: isDimmed ? 0.38 : 1,
+                            'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, filter 0.2s ease',
+                          opacity: isDimmed ? 0.35 : 1,
                           cursor: 'pointer',
                         }}
-                        className="hover:brightness-105 focus:outline-none"
+                        className="hover:brightness-105 focus:outline-none motion-reduce:transition-none"
                         tabIndex={0}
                         role="button"
                         aria-label={`${slice.name}: ${slice.count} reports, ${slice.percentFormatted}`}
@@ -420,19 +437,19 @@ export default function CategoryDistributionChart({
                   })}
                 </g>
 
-                {/* Center Donut Hole Backdrop */}
+                {/* Center Donut Hole Backdrop with subtle inner ring */}
                 <circle
                   cx={cx}
                   cy={cy}
-                  r={innerR - 4}
+                  r={innerR - 6}
                   fill="#ffffff"
                   stroke="#f1f5f9"
-                  strokeWidth="1.5"
+                  strokeWidth="2"
                 />
               </svg>
             ) : (
               /* Empty state fallback ring */
-              <div className="w-56 h-56 rounded-full border-4 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center">
+              <div className="w-60 h-60 rounded-full border-4 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center">
                 <span className="text-xs text-slate-400">No reports logged yet</span>
               </div>
             )}
@@ -441,30 +458,34 @@ export default function CategoryDistributionChart({
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-6 text-center select-none">
               {activeFocusItem ? (
                 <div className="animate-in fade-in zoom-in-95 duration-150 flex flex-col items-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    {effectiveSelectedCategory === activeFocusItem.name ? 'Active Filter' : 'Category Focus'}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full">
+                    Category Focus
                   </span>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-none my-1">
-                    {activeFocusItem.count}
+                  <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none my-1.5">
+                    {activeFocusItem.count} Reports
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full leading-none">
-                    {activeFocusItem.percentFormatted}
-                  </span>
-                  <p className="text-[11px] font-medium text-slate-600 truncate max-w-[130px] mt-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-700">
+                      {activeFocusItem.percentFormatted}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">of {totalCount} total</span>
+                  </div>
+                  <p className="text-[11px] font-semibold text-slate-700 truncate max-w-[140px] mt-1">
                     {activeFocusItem.name}
                   </p>
                 </div>
               ) : (
                 <div className="animate-in fade-in duration-200 flex flex-col items-center">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Total Tracked
+                    TOTAL TRACKED
                   </span>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-none my-1">
+                  <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none my-1.5">
                     {totalCount} Reports
                   </div>
-                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full mt-1.5">
-                    12 Categories
-                  </span>
+                  <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full mt-0.5 shadow-2xs">
+                    <TrendingUp className="w-3 h-3 text-emerald-600" aria-hidden="true" />
+                    <span>12 Categories</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -475,26 +496,15 @@ export default function CategoryDistributionChart({
           </p>
         </div>
 
-        {/* Right Column: Legend Breakdown with 2-Column Responsive Grid */}
+        {/* Right Column: Redesigned 2-Column Responsive Legend without nested scrollbar */}
         <div className="lg:col-span-7 space-y-3">
-          {/* Legend Summary Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-500 pb-2 border-b border-slate-100">
-            <span className="font-semibold text-slate-700">
-              Infrastructure Categories (12)
-            </span>
-            {topCategory && (
-              <span className="text-[11px] text-slate-500 hidden sm:inline">
-                Top: <strong className="text-slate-800">{topCategory.name}</strong> ({topCategory.count})
-              </span>
-            )}
-          </div>
-
-          {/* 2-Column Compact Legend Grid with Scrolling Container */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[340px] overflow-y-auto pr-1">
-            {categoryStats.map((cat) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {categoryStats.map((cat, idx) => {
               const isHovered = hoveredCategory === cat.name;
-              const isSelected = effectiveSelectedCategory === cat.name;
+              const isSelected = selectedCategory === cat.name;
+              const isTop = cat.count === maxCount && maxCount > 0;
               const IconComp = cat.icon || Layers;
+              const pctWidth = maxCount > 0 ? (cat.count / maxCount) * 100 : 0;
 
               return (
                 <button
@@ -503,94 +513,84 @@ export default function CategoryDistributionChart({
                   onClick={() => handleCategoryClick(cat.name)}
                   onMouseEnter={() => setHoveredCategory(cat.name)}
                   onMouseLeave={() => setHoveredCategory(null)}
-                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer group ${
+                  style={{
+                    animationDelay: `${idx * 25}ms`,
+                  }}
+                  className={`relative p-3 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between cursor-pointer group hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 motion-reduce:transition-none ${
                     isSelected
-                      ? 'bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
+                      ? 'bg-emerald-50/80 border-emerald-400 ring-2 ring-emerald-500/20 shadow-xs'
                       : isHovered
-                      ? 'bg-slate-50 border-slate-300 shadow-2xs'
-                      : 'bg-white border-slate-200/80 hover:bg-slate-50/60 hover:border-slate-300'
+                      ? 'bg-white border-slate-300 shadow-xs'
+                      : 'bg-white/90 border-slate-200/80 hover:bg-white hover:border-slate-300'
                   }`}
                   aria-pressed={isSelected}
                   aria-label={`Filter by ${cat.name}, ${cat.count} reports, ${cat.percentFormatted}`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    {/* Color Swatch Dot with Icon */}
-                    <div
-                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-transform group-hover:scale-105"
-                      style={{
-                        backgroundColor: cat.style.tint,
-                        borderColor: cat.style.border,
-                        color: cat.style.primary,
-                      }}
-                    >
-                      <IconComp className="w-3.5 h-3.5" aria-hidden="true" />
+                  {/* Top row: Icon, Category Name, Share & Count Badge */}
+                  <div className="flex items-center justify-between gap-2.5 w-full">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {/* Styled Category Icon Container */}
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-transform duration-200 group-hover:scale-105 motion-reduce:group-hover:scale-100"
+                        style={{
+                          backgroundColor: cat.style.tint,
+                          borderColor: cat.style.border,
+                          color: cat.style.primary,
+                        }}
+                      >
+                        <IconComp className="w-3.5 h-3.5" aria-hidden="true" />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-slate-800 group-hover:text-slate-900 truncate leading-snug">
+                          {cat.name}
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium">
+                          {cat.percentFormatted} share
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-semibold text-slate-800 group-hover:text-slate-900 truncate leading-snug">
-                        {cat.name}
-                      </div>
-                      <div className="text-[10px] text-slate-400 font-medium">
-                        {cat.percentFormatted} share
-                      </div>
+                    {/* Right side: Count Badge & optional Top Volume flag */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {isTop && (
+                        <span className="hidden xl:inline text-[9px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded-md">
+                          Most reported
+                        </span>
+                      )}
+                      <span
+                        className={`text-xs font-extrabold px-2 py-0.5 rounded-md border ${
+                          isSelected
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-slate-50 text-slate-800 border-slate-200/80 group-hover:bg-slate-100'
+                        }`}
+                      >
+                        {cat.count}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Count & Status Badge */}
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-md border ${
-                        isSelected
-                          ? 'bg-emerald-600 text-white border-emerald-600'
-                          : 'bg-slate-100 text-slate-700 border-slate-200/80 group-hover:bg-white'
-                      }`}
-                    >
-                      {cat.count}
-                    </span>
-                    {isSelected && (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
-                    )}
+                  {/* Bottom row: Slim colored progress indicator */}
+                  <div className="w-full bg-slate-100/90 rounded-full h-1 mt-2.5 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500 ease-out"
+                      style={{
+                        width: `${Math.min(100, Math.max(8, pctWidth))}%`,
+                        backgroundColor: cat.style.primary,
+                      }}
+                    />
                   </div>
                 </button>
               );
             })}
           </div>
-
-          {/* Active Filter Action Bar */}
-          {effectiveSelectedCategory !== 'All' && (
-            <div className="mt-3 p-3 bg-emerald-50/90 border border-emerald-200/90 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 text-emerald-900">
-                <Filter className="w-4 h-4 text-emerald-700 shrink-0" aria-hidden="true" />
-                <span>
-                  Filtering by <strong>{effectiveSelectedCategory}</strong>
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleNavigateToIssueBrowser(effectiveSelectedCategory)}
-                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
-                >
-                  <span>Open in Issue Browser</span>
-                  <ArrowRight className="w-3 h-3" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResetFilter}
-                  className="px-2 py-1 text-emerald-800 hover:text-emerald-950 font-medium underline cursor-pointer"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
       {/* 3. Floating Micro-Tooltip on Mouse Move */}
       {tooltipState.visible && tooltipState.data && (
         <div
-          className="absolute z-30 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 bg-slate-900/95 backdrop-blur-xs text-white p-2.5 rounded-xl shadow-xl border border-slate-700 text-xs min-w-[180px] animate-in fade-in duration-100"
+          className="absolute z-30 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 bg-slate-900/95 backdrop-blur-xs text-white p-2.5 rounded-xl shadow-xl border border-slate-700/80 text-xs min-w-[190px] animate-in fade-in duration-100"
           style={{
             left: `${tooltipState.x}px`,
             top: `${tooltipState.y - 12}px`,
@@ -614,8 +614,8 @@ export default function CategoryDistributionChart({
               {tooltipState.data.percentFormatted}
             </span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-800 flex items-center gap-1">
-            <span>Click to filter category</span>
+          <div className="text-[10px] text-slate-400 mt-1.5 pt-1.5 border-t border-slate-800 flex items-center gap-1">
+            <span>Click to filter in Issue Browser →</span>
           </div>
         </div>
       )}
