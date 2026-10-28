@@ -1041,6 +1041,16 @@ export default function App() {
             issues={issues}
             onOpenIssueDetail={handleOpenIssueDetail}
             currentTime={currentTime}
+            onSelectStatusFilter={handleSelectStatusFilter}
+            onViewAllIssues={(cat) => {
+              if (cat && typeof cat === 'string' && cat !== 'All') {
+                setActiveCategoryFilter(cat);
+              } else {
+                setActiveCategoryFilter('All');
+              }
+              setActiveStatusFilter('All Statuses');
+              setCurrentTab('issues');
+            }}
           />
         )}
 
