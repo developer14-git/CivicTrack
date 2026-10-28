@@ -57,3 +57,91 @@
   color: #0f172a;
 }
 
+/* =========================================================
+   Editorial Infographic Textures & Visual Effects Utilities
+   ========================================================= */
+
+/* Paper micro-dot pattern inspired by print data journalism */
+.bg-editorial-dots {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.45) 0.85px, transparent 0.85px);
+  background-size: 14px 14px;
+}
+
+/* Editorial subtle engineering grid */
+.bg-editorial-grid {
+  background-image:
+    linear-gradient(to right, rgba(203, 213, 225, 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Subtle cream warm-paper tint */
+.bg-editorial-paper {
+  background-color: #fafaf8;
+}
+
+/* Editorial tabular numerals for crisp numerical alignment */
+.tabular-editorial {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'cv05' 1;
+}
+
+/* Keyframe animations for infographic elements */
+@keyframes editorialFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes donutSegmentReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes progressSweep {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-editorial-enter {
+  animation: editorialFadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-donut-reveal {
+  transform-origin: center center;
+  animation: donutSegmentReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Respect user preference for reduced motion across all infographic animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-editorial-enter,
+  .animate-donut-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+

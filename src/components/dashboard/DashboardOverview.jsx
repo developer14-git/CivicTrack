@@ -12,6 +12,8 @@ import {
   Wrench,
   Clock,
   ShieldCheck,
+  Activity,
+  CheckCircle2,
 } from 'lucide-react';
 import StatusBadge from '../common/StatusBadge';
 import PriorityBadge from '../common/PriorityBadge';
@@ -71,7 +73,8 @@ export default function DashboardOverview({
       .slice(0, 8);
   }, [issues]);
 
-  // 4 Primary Summary Metrics calculated dynamically
+  // 4 Primary Summary Metrics calculated dynamically from real dataset
+  const totalCount = issues.length;
   const openCount = issues.filter((i) => i.status === 'Open').length;
   const inProgressCount = issues.filter((i) => i.status === 'In Progress').length;
   const awaitingVerificationCount = issues.filter(
@@ -79,6 +82,12 @@ export default function DashboardOverview({
   ).length;
   const verifiedResolvedCount = issues.filter((i) => i.status === 'Resolved').length;
 
+  // Accurate percentages for infographic visual comparisons
+  const openPct = totalCount > 0 ? (openCount / totalCount) * 100 : 0;
+  const inProgressPct = totalCount > 0 ? (inProgressCount / totalCount) * 100 : 0;
+  const awaitingVerificationPct = totalCount > 0 ? (awaitingVerificationCount / totalCount) * 100 : 0;
+  const verifiedResolvedPct = totalCount > 0 ? (verifiedResolvedCount / totalCount) * 100 : 0;
+  const mappedPct = totalCount > 0 ? ((mappedCount / totalCount) * 100).toFixed(1) : '0';
 
   // Short list of recent reports sorted by activity
   const recentReports = useMemo(() => {
@@ -100,137 +109,298 @@ export default function DashboardOverview({
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in text-left">
-      {/* 1. Hero Section for New Town, Kolkata */}
-      <section className="space-y-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full shadow-2xs">
-            New Town • Kolkata
-          </span>
-          <span className="text-xs text-slate-500 font-medium">
-            Action Area I, II & III Municipal Grievance Tracking
-          </span>
-        </div>
+    <div className="space-y-6 sm:space-y-8 animate-editorial-enter text-left">
+      {/* 1. Editorial Infographic Hero Header for New Town, Kolkata */}
+      <section className="relative bg-white rounded-2xl border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06),0_1px_3px_0_rgba(15,23,42,0.03)] p-6 sm:p-8 overflow-hidden bg-editorial-paper">
+        {/* Subtle Paper-like Micro-Texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-35 bg-editorial-dots" aria-hidden="true" />
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-          Report civic problems in New Town.
-        </h1>
+        {/* Decorative corner registration marks */}
+        <div className="absolute top-3 left-3 text-slate-300 font-mono text-[10px] select-none pointer-events-none" aria-hidden="true">+</div>
+        <div className="absolute top-3 right-3 text-slate-300 font-mono text-[10px] select-none pointer-events-none" aria-hidden="true">+</div>
 
-        <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
-          Report potholes, broken streetlights, overflowing garbage, and water leaks. Track municipal field repairs with transparent SLAs and independent community verification.
-        </p>
+        {/* Soft Ambient Corner Glows */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-br from-emerald-100/40 via-teal-100/25 to-transparent blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-gradient-to-tr from-amber-100/30 via-slate-100/20 to-transparent blur-3xl pointer-events-none" aria-hidden="true" />
 
-        <div className="flex items-center gap-3 pt-1">
-          <button
-            type="button"
-            onClick={onOpenReportModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-xs hover:shadow-sm transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Report a Problem</span>
-          </button>
+        {/* Subtle Civic Motif Silhouette SVG in Background */}
+        <svg
+          className="absolute -right-6 -bottom-6 w-56 h-56 text-emerald-950/[0.03] pointer-events-none select-none hidden md:block"
+          viewBox="0 0 160 160"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          aria-hidden="true"
+        >
+          <path d="M 20 140 H 140" />
+          <path d="M 40 140 V 60 L 60 40 L 80 60 V 140" />
+          <path d="M 90 140 V 80 H 130 V 140" />
+          <circle cx="110" cy="50" r="14" strokeDasharray="3 3" />
+          <path d="M 110 36 V 26" />
+        </svg>
 
-          <button
-            type="button"
-            onClick={onViewAllIssues}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 text-xs sm:text-sm font-semibold rounded-lg shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-          >
-            <span>Browse All Reports</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-          </button>
+        <div className="relative z-10 space-y-4 max-w-4xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest text-emerald-900 bg-emerald-50 border border-emerald-200/90 px-3 py-1 rounded-md shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              MUNICIPAL ISSUE OBSERVATORY • NEW TOWN, KOLKATA
+            </span>
+            <span className="text-xs text-slate-500 font-semibold">
+              Action Area I, II & III Municipal Public Works Audit
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">
+            Track, report, and verify public infrastructure across New Town.
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+            Report road hazards, faulty streetlights, drainage bottlenecks, and civic maintenance needs. Follow transparent field resolution SLAs with independent community photographic sign-offs.
+          </p>
+
+          {/* Infographic Telemetry Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 pb-1">
+            <div className="bg-white/80 backdrop-blur-xs p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Total Census</span>
+              <span className="text-base font-black text-slate-900 tabular-editorial">{totalCount} Reports</span>
+            </div>
+            <div className="bg-white/80 backdrop-blur-xs p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">GIS Mapped</span>
+              <span className="text-base font-black text-emerald-700 tabular-editorial">{mappedCount} ({mappedPct}%)</span>
+            </div>
+            <div className="bg-white/80 backdrop-blur-xs p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Hotspot Clusters</span>
+              <span className="text-base font-black text-amber-700 tabular-editorial">{hotspots.length} Zones</span>
+            </div>
+            <div className="bg-white/80 backdrop-blur-xs p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Verification</span>
+              <span className="text-base font-black text-slate-900 flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 inline shrink-0" />
+                Community
+              </span>
+            </div>
+          </div>
+
+          {/* Action CTAs */}
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onOpenReportModal}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer group"
+            >
+              <Plus className="w-4 h-4 transition-transform duration-200 group-hover:rotate-90" />
+              <span>Report a Problem</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onViewAllIssues}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-800 text-xs sm:text-sm font-bold rounded-xl shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+            >
+              <span>Browse All 200 Reports</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 group-hover:translate-x-1" />
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* 2. Primary Summary Report-Statistic Cards */}
-      <section aria-label="Key Grievance Summary Metrics">
+      {/* 2. Primary Summary Report-Statistic Cards (Editorial Infographic Presentation) */}
+      <section aria-label="Key Grievance Summary Metrics" className="space-y-3.5">
+        <div className="flex items-center justify-between pb-1">
+          <div>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+              CENSUS TELEMETRY • SECTION 01
+            </span>
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+              Lifecycle Resolution Pipeline
+            </h2>
+          </div>
+          <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
+            Click metric card to filter reports
+          </span>
+        </div>
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Card 1: Open Issues */}
           <button
             type="button"
             onClick={() => handleMetricClick('Open')}
-            className="group bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-amber-300 hover:shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer shadow-2xs"
+            className="group relative bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-amber-400 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer shadow-2xs hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="flex items-center justify-between">
-              <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/80 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <AlertCircle className="w-4 h-4" aria-hidden="true" />
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-800 bg-amber-50/80 border border-amber-200/60 px-2 py-0.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                Dispatch
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200/70 px-2 py-0.5 rounded-md tabular-editorial">
+                {openPct.toFixed(0)}% of total
               </span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none mt-3 mb-1">
+
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mt-3.5 mb-1 tabular-editorial">
               {openCount}
             </div>
-            <div className="text-sm font-semibold text-slate-800">Open Issues</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-800">Open Issues</div>
             <p className="text-[11px] text-slate-400 mt-0.5">Awaiting municipal dispatch</p>
+
+            {/* Proportional Mini-Bar Meter */}
+            <div className="w-full bg-slate-100 rounded-full h-1 mt-3 overflow-hidden">
+              <div
+                className="h-full bg-amber-500 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.max(5, openPct)}%` }}
+              />
+            </div>
           </button>
 
           {/* Card 2: In Progress */}
           <button
             type="button"
             onClick={() => handleMetricClick('In Progress')}
-            className="group bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-sky-300 hover:shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer shadow-2xs"
+            className="group relative bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-sky-400 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 cursor-pointer shadow-2xs hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="flex items-center justify-between">
-              <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-600 border border-sky-200/80 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 border border-sky-200/80 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <Wrench className="w-4 h-4" aria-hidden="true" />
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-sky-800 bg-sky-50/80 border border-sky-200/60 px-2 py-0.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                Active Repair
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-900 bg-sky-50 border border-sky-200/70 px-2 py-0.5 rounded-md tabular-editorial">
+                {inProgressPct.toFixed(0)}% of total
               </span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none mt-3 mb-1">
+
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mt-3.5 mb-1 tabular-editorial">
               {inProgressCount}
             </div>
-            <div className="text-sm font-semibold text-slate-800">In Progress</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-800">In Progress</div>
             <p className="text-[11px] text-slate-400 mt-0.5">Field crew actively on-site</p>
+
+            {/* Proportional Mini-Bar Meter */}
+            <div className="w-full bg-slate-100 rounded-full h-1 mt-3 overflow-hidden">
+              <div
+                className="h-full bg-sky-600 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.max(5, inProgressPct)}%` }}
+              />
+            </div>
           </button>
 
           {/* Card 3: Awaiting Verification */}
           <button
             type="button"
             onClick={() => handleMetricClick('Resolution Submitted')}
-            className="group bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-purple-300 hover:shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 cursor-pointer shadow-2xs"
+            className="group relative bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-purple-400 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 cursor-pointer shadow-2xs hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="flex items-center justify-between">
-              <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/80 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200/80 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <Clock className="w-4 h-4" aria-hidden="true" />
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-purple-800 bg-purple-50/80 border border-purple-200/60 px-2 py-0.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                Citizen Check
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-900 bg-purple-50 border border-purple-200/70 px-2 py-0.5 rounded-md tabular-editorial">
+                {awaitingVerificationPct.toFixed(0)}% of total
               </span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none mt-3 mb-1">
+
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mt-3.5 mb-1 tabular-editorial">
               {awaitingVerificationCount}
             </div>
-            <div className="text-sm font-semibold text-slate-800">Awaiting Verification</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-800">Awaiting Verification</div>
             <p className="text-[11px] text-slate-400 mt-0.5">Submitted, pending citizen check</p>
+
+            {/* Proportional Mini-Bar Meter */}
+            <div className="w-full bg-slate-100 rounded-full h-1 mt-3 overflow-hidden">
+              <div
+                className="h-full bg-purple-600 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.max(5, awaitingVerificationPct)}%` }}
+              />
+            </div>
           </button>
 
           {/* Card 4: Verified Resolved */}
           <button
             type="button"
             onClick={() => handleMetricClick('Resolved')}
-            className="group bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-emerald-300 hover:shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer shadow-2xs"
+            className="group relative bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left hover:border-emerald-400 hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer shadow-2xs hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="flex items-center justify-between">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/80 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <ShieldCheck className="w-4 h-4" aria-hidden="true" />
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-800 bg-emerald-50/80 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                Closed
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-900 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-md tabular-editorial">
+                {verifiedResolvedPct.toFixed(0)}% of total
               </span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none mt-3 mb-1">
+
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mt-3.5 mb-1 tabular-editorial">
               {verifiedResolvedCount}
             </div>
-            <div className="text-sm font-semibold text-slate-800">Verified Resolved</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-800">Verified Resolved</div>
             <p className="text-[11px] text-slate-400 mt-0.5">Closed with verification proof</p>
+
+            {/* Proportional Mini-Bar Meter */}
+            <div className="w-full bg-slate-100 rounded-full h-1 mt-3 overflow-hidden">
+              <div
+                className="h-full bg-emerald-600 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${Math.max(5, verifiedResolvedPct)}%` }}
+              />
+            </div>
           </button>
+        </div>
+
+        {/* Infographic Comparative Ratio Strip: Stacked Distribution Bar */}
+        <div className="bg-white rounded-xl border border-slate-200/85 p-3.5 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-emerald-600" />
+              Total Grievance Status Proportions
+            </span>
+            <span className="text-[11px] font-bold text-slate-400 tabular-editorial">
+              100% Census Share ({totalCount} Issues)
+            </span>
+          </div>
+
+          {/* Multi-segment stacked horizontal bar */}
+          <div className="w-full h-2.5 rounded-full overflow-hidden flex bg-slate-100">
+            <div
+              style={{ width: `${openPct}%` }}
+              className="bg-amber-500 h-full transition-all duration-500"
+              title={`Open: ${openCount} (${openPct.toFixed(1)}%)`}
+            />
+            <div
+              style={{ width: `${inProgressPct}%` }}
+              className="bg-sky-600 h-full transition-all duration-500"
+              title={`In Progress: ${inProgressCount} (${inProgressPct.toFixed(1)}%)`}
+            />
+            <div
+              style={{ width: `${awaitingVerificationPct}%` }}
+              className="bg-purple-600 h-full transition-all duration-500"
+              title={`Awaiting Verification: ${awaitingVerificationCount} (${awaitingVerificationPct.toFixed(1)}%)`}
+            />
+            <div
+              style={{ width: `${verifiedResolvedPct}%` }}
+              className="bg-emerald-600 h-full transition-all duration-500"
+              title={`Resolved: ${verifiedResolvedCount} (${verifiedResolvedPct.toFixed(1)}%)`}
+            />
+          </div>
+
+          {/* Legend Items */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="text-slate-600 font-medium">Open:</span>
+              <strong className="text-slate-900 tabular-editorial">{openCount} ({openPct.toFixed(1)}%)</strong>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sky-600" />
+              <span className="text-slate-600 font-medium">In Progress:</span>
+              <strong className="text-slate-900 tabular-editorial">{inProgressCount} ({inProgressPct.toFixed(1)}%)</strong>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-purple-600" />
+              <span className="text-slate-600 font-medium">Awaiting Check:</span>
+              <strong className="text-slate-900 tabular-editorial">{awaitingVerificationCount} ({awaitingVerificationPct.toFixed(1)}%)</strong>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-600" />
+              <span className="text-slate-600 font-medium">Verified Closed:</span>
+              <strong className="text-slate-900 tabular-editorial">{verifiedResolvedCount} ({verifiedResolvedPct.toFixed(1)}%)</strong>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -239,11 +409,16 @@ export default function DashboardOverview({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200/90">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg font-bold text-slate-900">New Town Issues Map</h2>
-              <span className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full">
-                {mappedCount} reports mapped on GIS
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                GEOGRAPHIC GIS • SECTION 03
+              </span>
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full">
+                {mappedCount} reports mapped on GIS ({mappedPct}%)
               </span>
             </div>
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">
+              New Town Spatial Cartography
+            </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               Live geographic issue distribution across Action Area I, II & III • OpenStreetMap
             </p>
@@ -254,7 +429,7 @@ export default function DashboardOverview({
               <button
                 type="button"
                 onClick={onNavigateToMap}
-                className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5 focus:outline-none focus-visible:underline cursor-pointer transition-colors"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5 focus:outline-none focus-visible:underline cursor-pointer transition-colors"
               >
                 <span>Explore full map</span>
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -277,7 +452,7 @@ export default function DashboardOverview({
           </div>
 
           {/* Clean Areas Needing Attention Side Panel */}
-          <div className="lg:col-span-5 xl:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
+          <div className="lg:col-span-5 xl:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between bg-editorial-paper relative">
             <div className="space-y-3.5">
               <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
                 <div className="flex items-center gap-1.5">
@@ -300,19 +475,19 @@ export default function DashboardOverview({
                 )}
               </div>
 
-              {/* Hotspot Chips */}
+              {/* Hotspot Chips with Infographic Rank Indicators */}
               <div className="flex flex-wrap gap-1.5">
-                {hotspots.slice(0, 6).map((hotspot) => (
+                {hotspots.slice(0, 6).map((hotspot, idx) => (
                   <button
                     key={hotspot.id}
                     type="button"
                     onClick={() => onNavigateToMap && onNavigateToMap(hotspot.id)}
-                    className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200/90 text-slate-700 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shadow-2xs"
                     title={`View ${hotspot.openCount} open reports (${hotspot.totalCount} total) at ${hotspot.name}`}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                    <span className="truncate max-w-[120px]">{hotspot.landmarkName || hotspot.name}</span>
-                    <strong className="text-slate-900 font-bold">({hotspot.totalCount})</strong>
+                    <span className="text-[9px] font-bold text-amber-800 bg-amber-50 px-1 py-0.2 rounded">#{idx + 1}</span>
+                    <span className="truncate max-w-[110px]">{hotspot.landmarkName || hotspot.name}</span>
+                    <strong className="text-slate-900 font-bold tabular-editorial">({hotspot.totalCount})</strong>
                   </button>
                 ))}
               </div>
@@ -320,7 +495,7 @@ export default function DashboardOverview({
               {/* Active Complaints List */}
               <div className="pt-1">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
                     Active Complaints
                   </span>
                   <span className="text-[10px] text-slate-400">Hover highlights pin</span>
@@ -339,7 +514,7 @@ export default function DashboardOverview({
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded">#{issue.id}</span>
+                          <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded tabular-editorial">#{issue.id}</span>
                           <h4 className="text-xs font-semibold text-slate-900 truncate">{issue.title}</h4>
                         </div>
                         <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
@@ -391,15 +566,20 @@ export default function DashboardOverview({
       <section aria-label="Recent Reports" className="space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-slate-200/90">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Recent Reports</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Latest civic maintenance submissions across New Town</p>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+              AUDIT FEED • SECTION 05
+            </span>
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+              Recent Submissions
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Latest civic maintenance grievances logged across New Town</p>
           </div>
           <button
             type="button"
             onClick={onViewAllIssues}
-            className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 focus:outline-none focus-visible:underline cursor-pointer transition-colors"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 focus:outline-none focus-visible:underline cursor-pointer transition-colors"
           >
-            <span>View all</span>
+            <span>View all reports</span>
             <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         </div>
@@ -428,7 +608,7 @@ export default function DashboardOverview({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">
+                        <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0 tabular-editorial">
                           #{issue.id}
                         </span>
                         <h3 className="text-sm font-semibold text-slate-900 leading-snug break-words">
@@ -474,19 +654,19 @@ export default function DashboardOverview({
         )}
       </section>
 
-      {/* 6. Quick Actions Section */}
+      {/* 6. Quick Actions Section (Editorial Action Tiles) */}
       <section aria-label="Quick Actions" className="pt-1">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-          Quick Actions
+        <h2 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2.5">
+          QUICK ACTIONS • NAVIGATION
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <button
             type="button"
             onClick={onOpenReportModal}
-            className="p-3.5 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group"
+            className="p-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-emerald-300 rounded-xl text-left transition-all duration-200 flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
-              <Plus className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <Plus className="w-5 h-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-slate-900">Report a Problem</div>
@@ -497,10 +677,10 @@ export default function DashboardOverview({
           <button
             type="button"
             onClick={onViewAllIssues}
-            className="p-3.5 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group"
+            className="p-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-sky-300 rounded-xl text-left transition-all duration-200 flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 group-hover:bg-sky-100 transition-colors">
-              <FileText className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 border border-sky-200/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <FileText className="w-5 h-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-slate-900">Browse All Reports</div>
@@ -511,10 +691,10 @@ export default function DashboardOverview({
           <button
             type="button"
             onClick={onNavigateToMyReports || onViewAllIssues}
-            className="p-3.5 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group"
+            className="p-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-purple-300 rounded-xl text-left transition-all duration-200 flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shrink-0 group-hover:bg-purple-100 transition-colors">
-              <UserCheck className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-200/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <UserCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-slate-900">My Submissions</div>
@@ -525,10 +705,10 @@ export default function DashboardOverview({
           <button
             type="button"
             onClick={onNavigateToAnalytics || onViewAllIssues}
-            className="p-3.5 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group"
+            className="p-4 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-amber-300 rounded-xl text-left transition-all duration-200 flex items-center gap-3 cursor-pointer shadow-2xs hover:shadow-xs group hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
           >
-            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 group-hover:bg-amber-100 transition-colors">
-              <BarChart3 className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <BarChart3 className="w-5 h-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-slate-900">Accountability Statistics</div>

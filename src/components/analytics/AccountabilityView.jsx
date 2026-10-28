@@ -198,10 +198,16 @@ export default function AccountabilityView({
   const displayedEvents = showAllEvents ? metrics.allEvents : metrics.allEvents.slice(0, 5);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-editorial-enter">
       {/* Page Header */}
       <div className="pb-3.5 border-b border-slate-200/90 text-left">
-        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-800 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-md">
+            MUNICIPAL AUDIT & SLA REPORT
+          </span>
+          <span className="text-xs text-slate-400 font-medium">New Town, Kolkata</span>
+        </div>
+        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-tight">
           Accountability Analytics
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -213,45 +219,52 @@ export default function AccountabilityView({
       <section aria-label="Key Accountability Metrics">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Metric 1: Total Reports */}
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs bg-editorial-paper hover:-translate-y-0.5 transition-transform duration-200">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
               Total Reports
             </span>
-            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
+            <div className="text-3xl font-black text-slate-900 mt-1 leading-none tabular-editorial">
               {metrics.total}
             </div>
+            <p className="text-[11px] text-slate-400 mt-1">Logged municipal complaints</p>
           </div>
 
           {/* Metric 2: Open Issues */}
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs bg-editorial-paper hover:-translate-y-0.5 transition-transform duration-200">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
                 Open Issues
               </span>
               <span className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-100" aria-hidden="true" />
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
+            <div className="text-3xl font-black text-slate-900 mt-1 leading-none tabular-editorial">
               {metrics.open}
             </div>
+            <p className="text-[11px] text-amber-700 font-medium mt-1">
+              {metrics.total > 0 ? ((metrics.open / metrics.total) * 100).toFixed(1) : 0}% of census
+            </p>
           </div>
 
           {/* Metric 3: Awaiting Verification */}
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs bg-editorial-paper hover:-translate-y-0.5 transition-transform duration-200">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
                 Awaiting Verification
               </span>
               <span className="w-2 h-2 rounded-full bg-purple-500 ring-2 ring-purple-100" aria-hidden="true" />
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
+            <div className="text-3xl font-black text-slate-900 mt-1 leading-none tabular-editorial">
               {metrics.submitted}
             </div>
+            <p className="text-[11px] text-purple-700 font-medium mt-1">
+              {metrics.total > 0 ? ((metrics.submitted / metrics.total) * 100).toFixed(1) : 0}% of census
+            </p>
           </div>
 
           {/* Metric 4: Overdue */}
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs bg-editorial-paper hover:-translate-y-0.5 transition-transform duration-200">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
                 Overdue
               </span>
               {metrics.overdueIssues.length > 0 ? (
@@ -261,12 +274,13 @@ export default function AccountabilityView({
               )}
             </div>
             <div
-              className={`text-3xl font-extrabold mt-1 leading-none ${
+              className={`text-3xl font-black mt-1 leading-none tabular-editorial ${
                 metrics.overdueIssues.length > 0 ? 'text-rose-700' : 'text-slate-900'
               }`}
             >
               {metrics.overdueIssues.length}
             </div>
+            <p className="text-[11px] text-slate-400 mt-1">Exceeded standard SLA deadline</p>
           </div>
         </div>
       </section>
