@@ -224,7 +224,8 @@ export function filterMappedIssues(
       const bldg = (issue.building || '').toLowerCase();
       const area = (issue.area || '').toLowerCase();
       const campus = (issue.campus || '').toLowerCase();
-      if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext) && !campus.includes(ext)) {
+      const hood = (issue.neighbourhood || '').toLowerCase();
+      if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext) && !campus.includes(ext) && !hood.includes(ext)) {
         return false;
       }
     }

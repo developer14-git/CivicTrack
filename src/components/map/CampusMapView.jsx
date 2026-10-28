@@ -25,11 +25,19 @@ export default function CampusMapView({
   onSelectCampus,
   onOpenIssueDetail,
   onOpenReportModal,
+  initialHotspotId = null,
+  onSelectHotspotId = null,
 }) {
-  const [selectedHotspotId, setSelectedHotspotId] = useState(null);
+  const [selectedHotspotId, setSelectedHotspotId] = useState(initialHotspotId);
+  const [prevInitialHotspotId, setPrevInitialHotspotId] = useState(initialHotspotId);
   const [hoveredIssueId, setHoveredIssueId] = useState(null);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   const mapApiRef = useRef(null);
+
+  if (initialHotspotId !== prevInitialHotspotId) {
+    setPrevInitialHotspotId(initialHotspotId);
+    setSelectedHotspotId(initialHotspotId);
+  }
 
   // Compute hotspots from actual issue data
   const hotspots = useMemo(() => {
@@ -47,11 +55,13 @@ export default function CampusMapView({
     if (selectedHotspotId === hotspot.id) {
       // Toggle off
       setSelectedHotspotId(null);
+      if (onSelectHotspotId) onSelectHotspotId(null);
       if (mapApiRef.current?.recenter) {
         mapApiRef.current.recenter();
       }
     } else {
       setSelectedHotspotId(hotspot.id);
+      if (onSelectHotspotId) onSelectHotspotId(hotspot.id);
       if (mapApiRef.current?.flyTo && hotspot.coordinates) {
         mapApiRef.current.flyTo(hotspot.coordinates.lat, hotspot.coordinates.lng, 15);
       }

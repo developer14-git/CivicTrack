@@ -68,7 +68,7 @@ export default function DashboardOverview({
   const activeSideIssues = useMemo(() => {
     return issues
       .filter((i) => i.status !== 'Resolved')
-      .slice(0, 6);
+      .slice(0, 8);
   }, [issues]);
 
   // 4 Primary Summary Metrics calculated dynamically
@@ -79,13 +79,13 @@ export default function DashboardOverview({
   ).length;
   const verifiedResolvedCount = issues.filter((i) => i.status === 'Resolved').length;
 
-  // Category statistics breakdown dynamically calculated from actual reports
+  // Category statistics breakdown dynamically calculated from actual reports across the 12 civic categories
   const categoryStats = useMemo(() => {
     const counts = {};
     issues.forEach((i) => {
       counts[i.category] = (counts[i.category] || 0) + 1;
     });
-    return CATEGORIES.map((cat) => ({
+    return CATEGORIES.filter((cat) => cat !== 'All').map((cat) => ({
       name: cat,
       count: counts[cat] || 0,
       percentage: issues.length > 0 ? Math.round(((counts[cat] || 0) / issues.length) * 100) : 0,
@@ -93,13 +93,15 @@ export default function DashboardOverview({
   }, [issues]);
 
   // Short list of recent reports sorted by activity
-  const recentReports = [...issues]
-    .sort((a, b) => {
-      if (a.status === 'Resolved' && b.status !== 'Resolved') return 1;
-      if (b.status === 'Resolved' && a.status !== 'Resolved') return -1;
-      return new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime();
-    })
-    .slice(0, 5);
+  const recentReports = useMemo(() => {
+    return [...issues]
+      .sort((a, b) => {
+        if (a.status === 'Resolved' && b.status !== 'Resolved') return 1;
+        if (b.status === 'Resolved' && a.status !== 'Resolved') return -1;
+        return new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime();
+      })
+      .slice(0, 6);
+  }, [issues]);
 
   const handleMetricClick = (status) => {
     if (onSelectStatusFilter) {
@@ -312,17 +314,17 @@ export default function DashboardOverview({
 
               {/* Hotspot Chips */}
               <div className="flex flex-wrap gap-1.5">
-                {hotspots.slice(0, 4).map((hotspot) => (
+                {hotspots.slice(0, 6).map((hotspot) => (
                   <button
                     key={hotspot.id}
                     type="button"
-                    onClick={onNavigateToMap}
+                    onClick={() => onNavigateToMap && onNavigateToMap(hotspot.id)}
                     className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200/90 text-slate-700 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-                    title={`View ${hotspot.openCount} open reports at ${hotspot.name}`}
+                    title={`View ${hotspot.openCount} open reports (${hotspot.totalCount} total) at ${hotspot.name}`}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                     <span className="truncate max-w-[120px]">{hotspot.landmarkName || hotspot.name}</span>
-                    <strong className="text-slate-900 font-bold">({hotspot.openCount})</strong>
+                    <strong className="text-slate-900 font-bold">({hotspot.totalCount})</strong>
                   </button>
                 ))}
               </div>
@@ -340,9 +342,10 @@ export default function DashboardOverview({
                   {activeSideIssues.map((issue) => (
                     <div
                       key={issue.id}
+                      onClick={() => onOpenIssueDetail && onOpenIssueDetail(issue.id)}
                       onMouseEnter={() => setHoveredIssueId(issue.id)}
                       onMouseLeave={() => setHoveredIssueId(null)}
-                      className={`py-2 px-2 flex items-center justify-between gap-2.5 rounded-lg transition-colors ${
+                      className={`py-2 px-2 flex items-center justify-between gap-2.5 rounded-lg transition-colors cursor-pointer ${
                         hoveredIssueId === issue.id ? 'bg-emerald-50/70 border border-emerald-200/60' : 'hover:bg-slate-50'
                       }`}
                     >
@@ -402,7 +405,7 @@ export default function DashboardOverview({
           </div>
           <button
             type="button"
-            onClick={onViewAllIssues}
+            onClick={() => onViewAllIssues && onViewAllIssues('All')}
             className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer transition-colors"
           >
             <span>Filter categories</span>
@@ -415,7 +418,7 @@ export default function DashboardOverview({
             <button
               key={cat.name}
               type="button"
-              onClick={onViewAllIssues}
+              onClick={() => onViewAllIssues && onViewAllIssues(cat.name)}
               className="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 rounded-xl text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group flex flex-col justify-between"
             >
               <div className="text-xs font-semibold text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2 leading-snug">

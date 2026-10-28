@@ -5,6 +5,7 @@ import {
   sanitizeIssueForStorage,
   isValidIssueSchema,
   validateAndParseBackupJSON,
+  loadIssuesFromStorage,
 } from '../src/utils/storageUtils.js';
 import { detectPossibleDuplicates } from '../src/utils/duplicateDetection.js';
 import { TOUR_STEPS } from '../src/data/tourSteps.js';
@@ -590,14 +591,14 @@ runTest('All 9 Demo Tour Steps are Defined and Non-Destructive', () => {
 // -------------------------------------------------------------
 console.log('\nGroup 6: Dataset Expansion, ID Collision & Storage Preservation');
 
-runTest('225-Report Demonstration Dataset Integrity & Uniqueness', () => {
-  assert.strictEqual(INITIAL_ISSUES.length, 225, `INITIAL_ISSUES should contain exactly 225 records (found ${INITIAL_ISSUES.length})`);
+runTest('200-Report Demonstration Dataset Integrity & Uniqueness', () => {
+  assert.strictEqual(INITIAL_ISSUES.length, 200, `INITIAL_ISSUES should contain exactly 200 records (found ${INITIAL_ISSUES.length})`);
 
   const ids = INITIAL_ISSUES.map((i) => i.id);
   const uniqueIds = new Set(ids);
-  assert.strictEqual(uniqueIds.size, 225, 'All 225 report IDs must be unique');
+  assert.strictEqual(uniqueIds.size, 200, 'All 200 report IDs must be unique');
 
-  for (let num = 101; num <= 325; num++) {
+  for (let num = 101; num <= 300; num++) {
     assert.ok(uniqueIds.has(`CT-${num}`), `Report ID CT-${num} must exist`);
   }
 
@@ -612,14 +613,14 @@ runTest('225-Report Demonstration Dataset Integrity & Uniqueness', () => {
   const verifiedCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'verified-gps').length;
 
   assert.strictEqual(verifiedCount, 0, 'No demo records should claim verified GPS without field survey');
-  assert.strictEqual(approxCount, 207, '207 reports have approximate landmark coordinates');
-  assert.strictEqual(unmappedCount, 18, '18 reports are in the unmapped queue');
-  assert.strictEqual(approxCount + unmappedCount, 225, 'Mapped + unmapped must equal 225');
+  assert.strictEqual(approxCount, 186, '186 reports have approximate landmark coordinates');
+  assert.strictEqual(unmappedCount, 14, '14 reports are in the unmapped queue');
+  assert.strictEqual(approxCount + unmappedCount, 200, 'Mapped + unmapped must equal 200');
 });
 
-runTest('Dynamic Next-ID Generation Never Collides with 225 Records or Restored Backup', () => {
-  // With 225 default issues
-  const maxExisting225 = INITIAL_ISSUES.reduce((max, issue) => {
+runTest('Dynamic Next-ID Generation Never Collides with 200 Records or Restored Backup', () => {
+  // With 200 default issues
+  const maxExisting200 = INITIAL_ISSUES.reduce((max, issue) => {
     const match = issue.id && String(issue.id).match(/^CT-(\d+)$/i);
     if (match) {
       const num = parseInt(match[1], 10);
@@ -627,7 +628,7 @@ runTest('Dynamic Next-ID Generation Never Collides with 225 Records or Restored 
     }
     return max;
   }, 100);
-  assert.strictEqual(`CT-${maxExisting225 + 1}`, 'CT-326', 'Next ID for default 225 issues must be CT-326');
+  assert.strictEqual(`CT-${maxExisting200 + 1}`, 'CT-301', 'Next ID for default 200 issues must be CT-301');
 
   // With restored backup containing higher ID
   const backupWithHighId = [...INITIAL_ISSUES, { id: 'CT-450', title: 'Restored issue' }];
@@ -640,6 +641,81 @@ runTest('Dynamic Next-ID Generation Never Collides with 225 Records or Restored 
     return max;
   }, 100);
   assert.strictEqual(`CT-${maxWithBackup + 1}`, 'CT-451', 'Next ID after restoring backup must exceed CT-450');
+});
+
+runTest('loadIssuesFromStorage Merges Single-Issue Stored State with Full Demonstration Dataset', () => {
+  const store = {};
+  globalThis.window = {
+    localStorage: {
+      getItem: (key) => store[key] || null,
+      setItem: (key, val) => { store[key] = val; },
+      removeItem: (key) => { delete store[key]; },
+    },
+  };
+
+  const storedPayload = [
+    // 1. Updated canonical demo issue
+    {
+      id: 'CT-101',
+      title: 'Updated water leak report',
+      category: 'Drainage and Flooding',
+      status: 'In Progress',
+      priority: 'High',
+      area: 'Action Area I',
+      building: 'Nazrul Tirtha',
+      supporters: 99,
+      isDemoReport: true,
+      reportedAt: '2026-03-01T10:00:00.000Z',
+    },
+    // 2. Obsolete demo issue from older 225/525 build
+    {
+      id: 'CT-325',
+      title: 'Obsolete demo issue from old build',
+      category: 'Roads and Footpaths',
+      status: 'Open',
+      priority: 'Medium',
+      area: 'Action Area II',
+      building: 'Eco Park',
+      isDemoReport: true,
+      reportedAt: '2026-03-01T10:00:00.000Z',
+    },
+    // 3. User-created report filed in prior session
+    {
+      id: 'CT-CUSTOM-1',
+      title: 'User filed complaint about broken sidewalk paver',
+      category: 'Roads and Footpaths',
+      status: 'Open',
+      priority: 'High',
+      area: 'Action Area I',
+      building: 'Nazrul Tirtha',
+      supporters: 5,
+      reportedAt: '2026-03-05T10:00:00.000Z',
+    },
+  ];
+
+  store['civictrack_issues_v1'] = JSON.stringify(storedPayload);
+  store['civictrack_meta_v1'] = JSON.stringify({ version: 1, lastSavedAt: new Date().toISOString() });
+
+  const result = loadIssuesFromStorage(INITIAL_ISSUES);
+  assert.strictEqual(result.source, 'storage', 'Source should be storage');
+  assert.strictEqual(result.issues.length, 201, 'Must have 200 demo issues + 1 user-created issue = 201');
+
+  // Check that obsolete demo issue CT-325 was pruned
+  const hasCt325 = result.issues.some((i) => i.id === 'CT-325');
+  assert.strictEqual(hasCt325, false, 'Obsolete demo issue CT-325 must be pruned');
+
+  // Check that user-created issue was retained
+  const userIssue = result.issues.find((i) => i.id === 'CT-CUSTOM-1');
+  assert.ok(userIssue, 'User-created report must be preserved');
+  assert.strictEqual(userIssue.title, 'User filed complaint about broken sidewalk paver');
+
+  // Check that CT-101 has updated fields
+  const ct101 = result.issues.find((i) => i.id === 'CT-101');
+  assert.strictEqual(ct101.supporters, 99, 'CT-101 updated supporters preserved');
+  assert.strictEqual(ct101.status, 'In Progress', 'CT-101 updated status preserved');
+
+  // Clean up global mock
+  delete globalThis.window;
 });
 
 console.log(`\n=== AUDIT COMPLETE: ${passedTests}/${totalTests} TESTS PASSED ===\n`);

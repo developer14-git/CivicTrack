@@ -53,6 +53,8 @@ export default function App() {
   const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
   const [activities, setActivities] = useState(MOCK_ACTIVITIES);
   const [activeStatusFilter, setActiveStatusFilter] = useState('All Statuses');
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('All');
+  const [activeHotspotId, setActiveHotspotId] = useState(null);
   const [isStaffMode, setIsStaffMode] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
@@ -983,11 +985,17 @@ export default function App() {
           <DashboardOverview
             issues={issues}
             onOpenReportModal={() => setIsReportModalOpen(true)}
-            onViewAllIssues={() => {
+            onViewAllIssues={(catName) => {
+              setActiveCategoryFilter(catName || 'All');
               setActiveStatusFilter('All Statuses');
               setCurrentTab('issues');
             }}
-            onNavigateToMap={() => setCurrentTab('map')}
+            onNavigateToMap={(hotspotId) => {
+              if (typeof hotspotId === 'string') {
+                setActiveHotspotId(hotspotId);
+              }
+              setCurrentTab('map');
+            }}
             onNavigateToMyReports={() => setCurrentTab('my-reports')}
             onNavigateToAnalytics={() => setCurrentTab('analytics')}
             onOpenIssueDetail={handleOpenIssueDetail}
@@ -1008,6 +1016,8 @@ export default function App() {
             onOpenReportModal={() => setIsReportModalOpen(true)}
             selectedStatus={activeStatusFilter}
             onSelectStatus={setActiveStatusFilter}
+            selectedCategory={activeCategoryFilter}
+            onSelectCategory={setActiveCategoryFilter}
             currentTime={currentTime}
             isStaffMode={isStaffMode}
           />
@@ -1021,6 +1031,8 @@ export default function App() {
             onOpenIssueDetail={handleOpenIssueDetail}
             onOpenReportModal={() => setIsReportModalOpen(true)}
             onToggleSupport={handleToggleSupport}
+            initialHotspotId={activeHotspotId}
+            onSelectHotspotId={setActiveHotspotId}
           />
         )}
 

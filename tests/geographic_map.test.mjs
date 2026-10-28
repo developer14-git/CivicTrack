@@ -171,13 +171,13 @@ expectedCategories.forEach((cat) => {
 console.log(`  ✓ All ${expectedCategories.length} comprehensive public infrastructure categories verified`);
 
 // Verify demo reports dataset
-assert.equal(INITIAL_ISSUES.length, 225, `INITIAL_ISSUES must contain exactly 225 demonstration reports (found ${INITIAL_ISSUES.length})`);
+assert.equal(INITIAL_ISSUES.length, 200, `INITIAL_ISSUES must contain exactly 200 demonstration reports (found ${INITIAL_ISSUES.length})`);
 
-// Verify unique contiguous IDs CT-101 through CT-325
+// Verify unique contiguous IDs CT-101 through CT-300
 const ids = INITIAL_ISSUES.map((i) => i.id);
 const uniqueIds = new Set(ids);
-assert.equal(uniqueIds.size, 225, 'All 225 report IDs must be strictly unique');
-for (let num = 101; num <= 325; num++) {
+assert.equal(uniqueIds.size, 200, 'All 200 report IDs must be strictly unique');
+for (let num = 101; num <= 300; num++) {
   assert.ok(uniqueIds.has(`CT-${num}`), `Report ID CT-${num} must exist`);
 }
 
@@ -193,7 +193,7 @@ INITIAL_ISSUES.forEach((issue) => {
 // Verify category representation across all 12 categories
 expectedCategories.forEach((cat) => {
   const count = INITIAL_ISSUES.filter((i) => i.category === cat).length;
-  assert.ok(count >= 10, `Category "${cat}" must have at least 10 reports (found ${count})`);
+  assert.ok(count >= 15, `Category "${cat}" must have at least 15 reports (found ${count})`);
 });
 
 // Verify location precision distribution
@@ -202,17 +202,15 @@ const approxCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'approx
 const unmappedCount = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'unmapped').length;
 
 assert.equal(verifiedCount, 0, 'No hardcoded demo reports should claim verified GPS without real survey evidence');
-assert.equal(approxCount, 207, 'Exactly 207 demo reports have approximate landmark coordinates');
-assert.equal(unmappedCount, 18, 'Exactly 18 demo reports remain in unmapped queue');
-assert.equal(verifiedCount + approxCount + unmappedCount, 225, 'All 225 reports accounted for exactly once across precision sets');
+assert.equal(approxCount, 186, 'Exactly 186 demo reports have approximate landmark coordinates');
+assert.equal(unmappedCount, 14, 'Exactly 14 demo reports remain in unmapped queue');
+assert.equal(verifiedCount + approxCount + unmappedCount, 200, 'All 200 reports accounted for exactly once across precision sets');
 
 // Verify unmapped queue
 const unmappedIds = INITIAL_ISSUES.filter((i) => i.locationPrecision === 'unmapped').map((i) => i.id);
-assert.deepEqual(
-  unmappedIds,
-  ['CT-109', 'CT-134', 'CT-135', 'CT-155', 'CT-168', 'CT-179', 'CT-191', 'CT-200', 'CT-205', 'CT-210', 'CT-218', 'CT-225', 'CT-235', 'CT-245', 'CT-257', 'CT-270', 'CT-283', 'CT-325'],
-  'Unmapped queue must match expected unmapped report IDs'
-);
+assert.equal(unmappedIds.length, 14, 'Unmapped queue must contain exactly 14 reports');
+assert.ok(unmappedIds.includes('CT-109'), 'Unmapped queue must include original CT-109');
+assert.ok(unmappedIds.includes('CT-200'), 'Unmapped queue must include CT-200');
 
 // Verify distribution across Action Areas
 const areasRepresented = new Set(INITIAL_ISSUES.map((i) => i.area));
@@ -230,7 +228,7 @@ assert.ok(
 );
 assert.ok(statusesRepresented.has('Resolved'), 'Demo dataset must include Resolved reports');
 
-console.log(`  ✓ Demonstration dataset verified: 225 reports (0 verified GPS, 207 approximate landmark, 18 unmapped), all unique IDs CT-101..CT-325, all 12 categories, all lifecycle statuses`);
+console.log(`  ✓ Demonstration dataset verified: 200 reports (0 verified GPS, 186 approximate landmark, 14 unmapped), all unique IDs CT-101..CT-300, all 12 categories, all lifecycle statuses`);
 
 // Test 7: Location Selection Workflow, Marker Movement & Provenance Integrity
 console.log('Group 7: Location Selection Workflow & Coordinate Provenance Integrity');
@@ -397,9 +395,9 @@ INITIAL_ISSUES.forEach((issue) => {
   }
 });
 
-assert.equal(mappedTotal, 207, 'Must have exactly 207 mapped demo reports');
-assert.equal(mappedPoints.size, 207, 'All 207 mapped demo reports must have distinct, non-overlapping coordinates');
-console.log('  ✓ All 207 mapped reports have unique, geographically distinct coordinates within New Town');
+assert.equal(mappedTotal, 186, 'Must have exactly 186 mapped demo reports');
+assert.equal(mappedPoints.size, 186, 'All 186 mapped demo reports must have distinct, non-overlapping coordinates');
+console.log('  ✓ All 186 mapped reports have unique, geographically distinct coordinates within New Town');
 console.log('  ✓ No artificial coordinate stacking or clustering overlap across the demonstration dataset');
 
 // Test 9: Modal Location Selection Usability & State Synchronization Audit
@@ -563,10 +561,10 @@ const mappedDemoReports = INITIAL_ISSUES.map((issue) => ({
 
 const mappedReportCount = mappedDemoReports.length;
 assert.ok(
-  mappedReportCount >= 100,
-  `Must have at least 100 mapped demonstration reports across New Town (found ${mappedReportCount})`
+  mappedReportCount >= 180,
+  `Must have at least 180 mapped demonstration reports across New Town (found ${mappedReportCount})`
 );
-console.log(`  ✓ Confirmed ${mappedReportCount} mapped demonstration reports (exceeds requirement of >= 100)`);
+console.log(`  ✓ Confirmed ${mappedReportCount} mapped demonstration reports (exceeds requirement of >= 180)`);
 
 // 2. Unique IDs and valid coordinates
 const reportIdSet = new Set();

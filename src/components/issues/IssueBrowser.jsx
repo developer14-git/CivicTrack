@@ -16,14 +16,19 @@ export default function IssueBrowser({
   onOpenReportModal,
   selectedStatus = 'All Statuses',
   onSelectStatus,
+  selectedCategory: controlledCategory,
+  onSelectCategory,
   currentTime,
   isStaffMode = false,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [localCategory, setLocalCategory] = useState('All');
   const [selectedArea, setSelectedArea] = useState('All Areas');
   const [localStatus, setLocalStatus] = useState('All Statuses');
   const [sortBy, setSortBy] = useState('newest');
+
+  const selectedCategory = controlledCategory !== undefined ? controlledCategory : localCategory;
+  const setSelectedCategory = onSelectCategory || setLocalCategory;
 
   const currentStatus = onSelectStatus ? selectedStatus : localStatus;
   const handleStatusChange = (val) => {

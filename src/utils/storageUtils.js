@@ -190,9 +190,41 @@ export function loadIssuesFromStorage(fallbackIssues = []) {
       };
     }
 
+    // Intelligent merge: ensure all demonstration fallback issues are present even if
+    // an older session in localStorage stored only a partial subset or single issue.
+    // Preserves user changes/status updates to known issues and retains new user-reported tickets.
+    const storedById = new Map();
+    validIssues.forEach((issue) => storedById.set(issue.id, issue));
+
+    const mergedIssues = fallbackIssues.map((fallback) => {
+      if (storedById.has(fallback.id)) {
+        const updated = storedById.get(fallback.id);
+        storedById.delete(fallback.id);
+        return updated;
+      }
+      return fallback;
+    });
+
+    // Any remaining stored issues are custom tickets created by the user (e.g. newly filed reports).
+    // Obsolete demo records from prior expansions or test builds (where isDemoReport === true)
+    // are pruned so they do not cause the demonstration dataset to exceed the canonical 200 issues.
+    let prunedObsoleteDemoCount = 0;
+    for (const [, customIssue] of storedById) {
+      if (!customIssue.isDemoReport) {
+        mergedIssues.unshift(customIssue);
+      } else {
+        prunedObsoleteDemoCount++;
+      }
+    }
+
+    // If obsolete demo issues were pruned from a previous larger build, persist the clean migrated set
+    if (prunedObsoleteDemoCount > 0 && isStorageAvailable()) {
+      saveIssuesToStorage(mergedIssues);
+    }
+
     const meta = getStorageMetadata();
     return {
-      issues: validIssues,
+      issues: mergedIssues.length > 0 ? mergedIssues : validIssues,
       source: 'storage',
       isAvailable: true,
       lastSavedAt: meta.lastSavedAt,
