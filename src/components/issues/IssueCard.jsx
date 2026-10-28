@@ -62,20 +62,20 @@ export default function IssueCard({
       tabIndex={0}
       role="button"
       aria-labelledby={`issue-title-${issue.id}`}
-      className="group bg-white rounded-lg border border-slate-200 p-4 hover:border-slate-300 transition-colors cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 flex flex-col justify-between"
+      className="group bg-white rounded-xl border border-slate-200/90 p-4 hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 flex flex-col justify-between shadow-2xs"
     >
       <div className="space-y-2">
         {/* ID, Category & Age in smaller text */}
         <div className="flex items-center justify-between text-xs text-slate-500 gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="font-mono font-medium text-slate-600 shrink-0">{issue.id}</span>
+            <span className="font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] shrink-0">#{issue.id}</span>
             {issue.category && (
-              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium truncate">
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200/60 px-1.5 py-0.5 rounded-md font-semibold truncate">
                 {issue.category}
               </span>
             )}
           </div>
-          <span className="shrink-0">{ageText}</span>
+          <span className="shrink-0 text-[11px] font-medium text-slate-400">{ageText}</span>
         </div>
 
         {/* Issue Title */}
@@ -101,9 +101,9 @@ export default function IssueCard({
       {/* Badges & Optional Endorsement count */}
       <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-slate-100">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <StatusBadge status={issue.status} />
+          <StatusBadge status={issue.status} size="xs" />
           {issue.priority && (
-            <PriorityBadge priority={issue.priority} />
+            <PriorityBadge priority={issue.priority} size="xs" />
           )}
         </div>
 
@@ -112,9 +112,9 @@ export default function IssueCard({
           <button
             type="button"
             onClick={handleSupportClick}
-            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors ${
+            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md transition-colors ${
               issue.supportedByMe
-                ? 'bg-emerald-50 text-emerald-800 font-semibold'
+                ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200/60'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
             }`}
             title={issue.supportedByMe ? 'You endorsed this report' : 'Endorse this report'}

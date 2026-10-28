@@ -192,15 +192,15 @@ export default function DataManagementModal({
       <div className="fixed inset-0" onClick={handleClose} aria-hidden="true" />
 
       {/* Modal Dialog */}
-      <div className="relative bg-white rounded-xl shadow-xl border border-slate-200 max-w-xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/90 max-w-xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
         {/* Sticky Header Bar */}
-        <div className="shrink-0 bg-white border-b border-slate-200 px-5 py-4 flex items-center justify-between gap-3">
+        <div className="shrink-0 bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="p-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80">
               <Database className="w-5 h-5" aria-hidden="true" />
             </span>
             <div>
-              <h2 id="data-mgmt-title" className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+              <h2 id="data-mgmt-title" className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-tight">
                 Local Data & Persistence Management
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -213,7 +213,7 @@ export default function DataManagementModal({
             ref={closeButtonRef}
             type="button"
             onClick={handleClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
             aria-label="Close data management modal"
           >
             <X className="w-5 h-5" />
@@ -223,7 +223,7 @@ export default function DataManagementModal({
         {/* Action Feedback Banner */}
         {actionFeedback && (
           <div
-            className={`px-5 py-2.5 text-xs font-semibold flex items-center justify-between gap-2 border-b ${
+            className={`px-6 py-2.5 text-xs font-semibold flex items-center justify-between gap-2 border-b ${
               actionFeedback.type === 'success'
                 ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
                 : actionFeedback.type === 'error'
@@ -244,7 +244,7 @@ export default function DataManagementModal({
             <button
               type="button"
               onClick={() => setActionFeedback(null)}
-              className="text-slate-400 hover:text-slate-600 p-0.5"
+              className="text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -252,13 +252,13 @@ export default function DataManagementModal({
         )}
 
         {/* Navigation Tabs inside modal */}
-        <div className="flex border-b border-slate-200 bg-slate-50/70 px-5 text-xs font-semibold">
+        <div className="flex border-b border-slate-200/80 bg-slate-50/70 px-6 text-xs font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab('overview')}
-            className={`py-2.5 px-3 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 px-3.5 border-b-2 transition-colors cursor-pointer ${
               activeTab === 'overview'
-                ? 'border-emerald-700 text-emerald-900 font-bold bg-white'
+                ? 'border-emerald-600 text-emerald-950 font-bold bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -267,9 +267,9 @@ export default function DataManagementModal({
           <button
             type="button"
             onClick={() => setActiveTab('backup')}
-            className={`py-2.5 px-3 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 px-3.5 border-b-2 transition-colors cursor-pointer ${
               activeTab === 'backup'
-                ? 'border-emerald-700 text-emerald-900 font-bold bg-white'
+                ? 'border-emerald-600 text-emerald-950 font-bold bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -278,9 +278,9 @@ export default function DataManagementModal({
           <button
             type="button"
             onClick={() => setActiveTab('restore')}
-            className={`py-2.5 px-3 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 px-3.5 border-b-2 transition-colors cursor-pointer ${
               activeTab === 'restore'
-                ? 'border-emerald-700 text-emerald-900 font-bold bg-white'
+                ? 'border-emerald-600 text-emerald-950 font-bold bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -289,9 +289,9 @@ export default function DataManagementModal({
           <button
             type="button"
             onClick={() => setActiveTab('reset')}
-            className={`py-2.5 px-3 border-b-2 transition-colors cursor-pointer ${
+            className={`py-2.5 px-3.5 border-b-2 transition-colors cursor-pointer ${
               activeTab === 'reset'
-                ? 'border-rose-600 text-rose-800 font-bold bg-white'
+                ? 'border-rose-600 text-rose-900 font-bold bg-white'
                 : 'border-transparent text-slate-600 hover:text-rose-700'
             }`}
           >
@@ -544,14 +544,14 @@ export default function DataManagementModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="shrink-0 bg-slate-50 border-t border-slate-200 px-5 py-3 flex items-center justify-between text-xs text-slate-500">
+        <div className="shrink-0 bg-slate-50/80 border-t border-slate-200/80 px-6 py-3.5 flex items-center justify-between text-xs text-slate-500">
           <span className="truncate">
             Client-Side Storage &bull; No Remote Server Sync
           </span>
           <button
             type="button"
             onClick={handleClose}
-            className="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 rounded-md text-xs font-semibold text-slate-700 transition-colors"
+            className="px-4 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 shadow-2xs transition-colors cursor-pointer"
           >
             Close
           </button>

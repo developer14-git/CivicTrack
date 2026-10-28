@@ -48,15 +48,15 @@ export default function HelpModal({ isOpen, onClose }) {
     >
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
-      <div className="relative bg-white rounded-xl shadow-xl border border-slate-200 max-w-xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/90 max-w-xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
         {/* Header */}
-        <div className="shrink-0 bg-white border-b border-slate-200 px-5 py-4 flex items-center justify-between gap-3">
+        <div className="shrink-0 bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center shrink-0">
-              <HelpCircle className="w-5 h-5 text-emerald-200" aria-hidden="true" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <HelpCircle className="w-5 h-5 text-emerald-100" aria-hidden="true" />
             </div>
             <div>
-              <h2 id="help-modal-title" className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+              <h2 id="help-modal-title" className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-tight">
                 About New Town CivicTrack
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -69,7 +69,7 @@ export default function HelpModal({ isOpen, onClose }) {
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Close help modal"
           >
             <X className="w-5 h-5" />
@@ -77,7 +77,7 @@ export default function HelpModal({ isOpen, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5 text-xs text-slate-700 leading-relaxed">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs text-slate-700 leading-relaxed">
           {/* Mission */}
           <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-3.5 space-y-1">
             <h3 className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
@@ -151,11 +151,11 @@ export default function HelpModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 bg-slate-50 border-t border-slate-200 px-5 py-3 flex items-center justify-end">
+        <div className="shrink-0 bg-slate-50/80 border-t border-slate-200/80 px-6 py-3.5 flex items-center justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 text-xs font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded transition-colors"
+            className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 rounded-lg shadow-xs transition-colors cursor-pointer"
           >
             Got it, close
           </button>

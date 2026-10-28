@@ -15,6 +15,8 @@ import {
   createCustomMarkerIcon,
   createClusterIcon,
   createPopupHtml,
+  filterMappedIssues,
+  clusterMappedIssues,
 } from '../../utils/mapUtils';
 import {
   CATEGORIES,
@@ -87,59 +89,13 @@ export default function GeographicMap({
 
   // Apply filters to mapped issues
   const visibleMappedIssues = useMemo(() => {
-    return mappedIssues.filter(({ issue }) => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchesQuery =
-          (issue.id && issue.id.toLowerCase().includes(q)) ||
-          (issue.title && issue.title.toLowerCase().includes(q)) ||
-          (issue.location && issue.location.toLowerCase().includes(q)) ||
-          (issue.building && issue.building.toLowerCase().includes(q)) ||
-          (issue.category && issue.category.toLowerCase().includes(q)) ||
-          (issue.neighbourhood && issue.neighbourhood.toLowerCase().includes(q));
-        if (!matchesQuery) return false;
-      }
-
-      // External filter (e.g. clicked Hotspot landmark or selected Action Area)
-      if (externalFilter && externalFilter !== 'ALL' && externalFilter !== 'All Action Areas') {
-        const ext = externalFilter.toLowerCase();
-        const loc = (issue.location || '').toLowerCase();
-        const bldg = (issue.building || '').toLowerCase();
-        const area = (issue.area || '').toLowerCase();
-        const campus = (issue.campus || '').toLowerCase();
-        if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext) && !campus.includes(ext)) {
-          return false;
-        }
-      }
-
-      // Category filter
-      if (categoryFilter !== 'All' && issue.category !== categoryFilter) {
-        return false;
-      }
-
-      // Status filter
-      if (statusFilter !== 'ALL') {
-        if (statusFilter === 'Awaiting Verification') {
-          if (issue.status !== 'Resolution Submitted' && issue.status !== 'Awaiting Verification') {
-            return false;
-          }
-        } else if (issue.status !== statusFilter) {
-          return false;
-        }
-      }
-
-      // Priority filter
-      if (priorityFilter !== 'ALL' && issue.priority !== priorityFilter) {
-        return false;
-      }
-
-      // Unresolved only
-      if (unresolvedOnly && issue.status === 'Resolved') {
-        return false;
-      }
-
-      return true;
+    return filterMappedIssues(mappedIssues, {
+      searchQuery,
+      externalFilter,
+      categoryFilter,
+      statusFilter,
+      priorityFilter,
+      unresolvedOnly,
     });
   }, [
     mappedIssues,
@@ -326,69 +282,11 @@ export default function GeographicMap({
     if (visibleMappedIssues.length === 0) return;
 
     const currentZoom = map.getZoom();
-
-    // Responsive spatial clustering threshold based on zoom level:
-    // At zoom >= 16: completely unclustered, every issue rendered as an individual marker
-    // At zoom 15: narrow threshold (10px) to separate individual streets
-    // At zoom 14: moderate threshold (18px) to separate sub-neighborhoods
-    // At zoom 13: 24px (instead of previous 40px) so distinct landmarks and corridors appear across New Town
-    // At zoom <= 12: 32px for township regional overview
-    let clusterThreshold;
-    if (currentZoom >= 16) {
-      clusterThreshold = 0; // Show all individual markers
-    } else if (currentZoom === 15) {
-      clusterThreshold = 10;
-    } else if (currentZoom === 14) {
-      clusterThreshold = 18;
-    } else if (currentZoom === 13) {
-      clusterThreshold = 24;
-    } else {
-      clusterThreshold = 32;
-    }
-
-    // Cluster points spatially
-    const clusters = [];
-    const visited = new Set();
-
-    for (let i = 0; i < visibleMappedIssues.length; i++) {
-      if (visited.has(i)) continue;
-      visited.add(i);
-
-      const p1 = visibleMappedIssues[i];
-      const pt1 = map.latLngToContainerPoint([p1.lat, p1.lng]);
-      const clusterItems = [p1];
-
-      if (clusterThreshold > 0) {
-        for (let j = i + 1; j < visibleMappedIssues.length; j++) {
-          if (visited.has(j)) continue;
-          const p2 = visibleMappedIssues[j];
-          const pt2 = map.latLngToContainerPoint([p2.lat, p2.lng]);
-          const dist = Math.hypot(pt1.x - pt2.x, pt1.y - pt2.y);
-
-          if (dist < clusterThreshold) {
-            visited.add(j);
-            clusterItems.push(p2);
-          }
-        }
-      }
-
-      if (clusterItems.length === 1) {
-        clusters.push({
-          isCluster: false,
-          item: clusterItems[0],
-        });
-      } else {
-        const avgLat = clusterItems.reduce((acc, c) => acc + c.lat, 0) / clusterItems.length;
-        const avgLng = clusterItems.reduce((acc, c) => acc + c.lng, 0) / clusterItems.length;
-        clusters.push({
-          isCluster: true,
-          items: clusterItems,
-          lat: avgLat,
-          lng: avgLng,
-          count: clusterItems.length,
-        });
-      }
-    }
+    const clusters = clusterMappedIssues(
+      visibleMappedIssues,
+      currentZoom,
+      (lat, lng) => map.latLngToContainerPoint([lat, lng])
+    );
 
     // Detect identical coordinates among individual markers for visual spiderfy
     const coordUsage = new Map();
@@ -564,7 +462,7 @@ export default function GeographicMap({
   return (
     <div
       ref={wrapperRef}
-      className={`relative bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shadow-2xs select-none transition-all ${
+      className={`relative bg-slate-100 rounded-xl overflow-hidden border border-slate-200/90 shadow-2xs select-none transition-all ${
         isFullscreen ? 'fixed inset-0 z-50 rounded-none border-none' : ''
       }`}
       style={{ height: isFullscreen ? '100vh' : height }}
@@ -575,7 +473,7 @@ export default function GeographicMap({
       {/* 2. Floating Top-Left Search and Filter Panel */}
       <div className="absolute top-3 left-3 z-10 max-w-sm sm:max-w-md w-[calc(100%-1.5rem)] pointer-events-auto space-y-2">
         {/* Dataset visibility badge & active filters reset bar */}
-        <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-md shadow-2xs border border-slate-200/80 text-[11px] text-slate-600">
+        <div className="flex items-center justify-between gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-md rounded-lg shadow-2xs border border-slate-200/90 text-[11px] text-slate-600">
           <div className="flex items-center gap-1.5 truncate">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             <span className="font-medium text-slate-700 truncate">
@@ -594,7 +492,7 @@ export default function GeographicMap({
         </div>
 
         {/* Search Bar + Quick Actions */}
-        <div className="bg-white/95 backdrop-blur-md rounded-lg shadow-sm border border-slate-200/80 p-1.5 flex items-center gap-1.5">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-sm border border-slate-200/90 p-1.5 flex items-center gap-1.5">
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input

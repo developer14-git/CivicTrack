@@ -256,7 +256,7 @@ export default function DemoTour({
               <button
                 type="button"
                 onClick={() => onStepChange(currentStep + 1)}
-                className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg font-semibold text-white bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 shadow-xs transition-colors"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-xs transition-colors cursor-pointer"
                 aria-label="Next step"
               >
                 <span>Next</span>
@@ -266,7 +266,7 @@ export default function DemoTour({
               <button
                 type="button"
                 onClick={onComplete}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-semibold text-white bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 shadow-xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-xs transition-colors cursor-pointer"
                 aria-label="Finish presentation tour"
               >
                 <span>Finish</span>

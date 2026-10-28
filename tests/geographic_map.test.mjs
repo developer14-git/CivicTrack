@@ -27,6 +27,9 @@ const {
   STATUS_PIN_COLORS,
   computeHotspots,
   createPopupHtml,
+  filterMappedIssues,
+  clusterMappedIssues,
+  getClusterThreshold,
 } = await import('../src/utils/mapUtils.js');
 
 
@@ -548,6 +551,174 @@ console.log('  ✓ Marker drag live position updates and commits exact coordinat
 console.log('  ✓ Landmark search navigation clearly distinguished from explicit pin selection');
 console.log('  ✓ Complete state synchronization across map, badges, nearest landmark, and report payload');
 console.log('  ✓ Map navigation coordinates strictly validated and manual pin preserved across searches');
+
+// Test 10: User Verification Criteria: Dataset Scale, Bounds, Action Area Distribution & Filtered Clustering
+console.log('\nGroup 10: User Verification Criteria (Dataset Scale, Bounds, Action Areas, Honest GPS, Filtered Clustering)');
+
+// 1. At least 100 mapped demonstration reports
+const mappedDemoReports = INITIAL_ISSUES.map((issue) => ({
+  issue,
+  coords: resolveIssueCoordinates(issue),
+})).filter((x) => x.coords !== null);
+
+const mappedReportCount = mappedDemoReports.length;
+assert.ok(
+  mappedReportCount >= 100,
+  `Must have at least 100 mapped demonstration reports across New Town (found ${mappedReportCount})`
+);
+console.log(`  ✓ Confirmed ${mappedReportCount} mapped demonstration reports (exceeds requirement of >= 100)`);
+
+// 2. Unique IDs and valid coordinates
+const reportIdSet = new Set();
+mappedDemoReports.forEach(({ issue, coords }) => {
+  assert.ok(issue.id && typeof issue.id === 'string' && issue.id.trim() !== '', `Issue must have valid non-empty string ID: ${issue.id}`);
+  assert.equal(reportIdSet.has(issue.id), false, `Issue ID ${issue.id} must be unique`);
+  reportIdSet.add(issue.id);
+
+  assert.ok(typeof coords.lat === 'number' && Number.isFinite(coords.lat), `Issue ${issue.id} lat must be a finite number`);
+  assert.ok(typeof coords.lng === 'number' && Number.isFinite(coords.lng), `Issue ${issue.id} lng must be a finite number`);
+});
+console.log(`  ✓ All ${mappedReportCount} mapped reports have unique IDs and valid finite numeric coordinates`);
+
+// 3. Coordinates within the intended geographic bounds
+mappedDemoReports.forEach(({ issue, coords }) => {
+  assert.equal(
+    isWithinNewTownBounds(coords.lat, coords.lng),
+    true,
+    `Report ${issue.id} coordinates (${coords.lat}, ${coords.lng}) must fall strictly within New Town geographic bounds`
+  );
+});
+console.log(`  ✓ All ${mappedReportCount} coordinates strictly within New Town, Kolkata bounds (22.52-22.66 N, 88.42-88.54 E)`);
+
+// 4. Distribution across all three Action Areas
+const areaDistribution = {
+  'Action Area I': 0,
+  'Action Area II': 0,
+  'Action Area III': 0,
+};
+mappedDemoReports.forEach(({ issue }) => {
+  if (areaDistribution[issue.area] !== undefined) {
+    areaDistribution[issue.area]++;
+  }
+});
+
+assert.ok(areaDistribution['Action Area I'] >= 20, `Action Area I must have ample reports (found ${areaDistribution['Action Area I']})`);
+assert.ok(areaDistribution['Action Area II'] >= 20, `Action Area II must have ample reports (found ${areaDistribution['Action Area II']})`);
+assert.ok(areaDistribution['Action Area III'] >= 20, `Action Area III must have ample reports (found ${areaDistribution['Action Area III']})`);
+console.log(`  ✓ Strong geographic distribution: Action Area I: ${areaDistribution['Action Area I']}, Action Area II: ${areaDistribution['Action Area II']}, Action Area III: ${areaDistribution['Action Area III']}`);
+
+// 5. No false claim that approximate coordinates are GPS-verified
+mappedDemoReports.forEach(({ issue, coords }) => {
+  if (issue.isDemoReport) {
+    assert.notEqual(
+      issue.locationPrecision,
+      'verified-gps',
+      `Demonstration report ${issue.id} must NOT claim verified GPS coordinates without empirical survey`
+    );
+    assert.equal(
+      coords.isExact,
+      false,
+      `Resolved coordinates for demo report ${issue.id} must be flagged isExact: false`
+    );
+    assert.equal(
+      issue.locationPrecision,
+      'approximate-landmark',
+      `Demonstration report ${issue.id} must have locationPrecision === 'approximate-landmark'`
+    );
+  }
+});
+console.log('  ✓ No false claims of verified GPS: all demonstration reports truthfully designated approximate landmark precision');
+
+// 6. Marker and cluster counts respecting the active filters
+const preparedMappedIssues = mappedDemoReports.map(({ issue, coords }) => ({
+  issue,
+  lat: coords.lat,
+  lng: coords.lng,
+  isExact: coords.isExact,
+  source: coords.source,
+}));
+
+// 6a: Category filtering & cluster verification
+const testCategory = 'Roads and Footpaths';
+const roadsIssues = filterMappedIssues(preparedMappedIssues, { categoryFilter: testCategory });
+assert.ok(roadsIssues.length > 0, `Filtered category "${testCategory}" must return issues`);
+roadsIssues.forEach(({ issue }) => {
+  assert.equal(issue.category, testCategory, `Every issue in filtered set must have category "${testCategory}"`);
+});
+const roadsClusters = clusterMappedIssues(roadsIssues, 13);
+const totalRoadsInClusters = roadsClusters.reduce((acc, c) => acc + (c.isCluster ? c.count : 1), 0);
+assert.equal(totalRoadsInClusters, roadsIssues.length, 'Roads cluster items count must exactly equal filtered issues count');
+
+// 6b: Status filtering (Open, In Progress, Verification, Resolved)
+const openIssues = filterMappedIssues(preparedMappedIssues, { statusFilter: 'Open' });
+assert.ok(openIssues.length > 0, 'Open status filter must return issues');
+openIssues.forEach(({ issue }) => assert.equal(issue.status, 'Open'));
+const openClusters = clusterMappedIssues(openIssues, 13);
+const totalOpenInClusters = openClusters.reduce((acc, c) => acc + (c.isCluster ? c.count : 1), 0);
+assert.equal(totalOpenInClusters, openIssues.length, 'Open clusters count must match filtered Open issues count');
+
+const inProgressIssues = filterMappedIssues(preparedMappedIssues, { statusFilter: 'In Progress' });
+assert.ok(inProgressIssues.length > 0, 'In Progress status filter must return issues');
+inProgressIssues.forEach(({ issue }) => assert.equal(issue.status, 'In Progress'));
+
+const verificationIssues = filterMappedIssues(preparedMappedIssues, { statusFilter: 'Awaiting Verification' });
+assert.ok(verificationIssues.length > 0, 'Awaiting Verification status filter must return issues');
+verificationIssues.forEach(({ issue }) => {
+  assert.ok(issue.status === 'Resolution Submitted' || issue.status === 'Awaiting Verification');
+});
+
+const resolvedIssues = filterMappedIssues(preparedMappedIssues, { statusFilter: 'Resolved' });
+assert.ok(resolvedIssues.length > 0, 'Resolved status filter must return issues');
+resolvedIssues.forEach(({ issue }) => assert.equal(issue.status, 'Resolved'));
+
+// 6c: Priority filtering
+const highPriorityIssues = filterMappedIssues(preparedMappedIssues, { priorityFilter: 'High' });
+assert.ok(highPriorityIssues.length > 0, 'High priority filter must return issues');
+highPriorityIssues.forEach(({ issue }) => assert.equal(issue.priority, 'High'));
+
+// 6d: Action Area / externalFilter
+const area3Issues = filterMappedIssues(preparedMappedIssues, { externalFilter: 'Action Area III' });
+assert.ok(area3Issues.length > 0, 'Action Area III filter must return issues');
+area3Issues.forEach(({ issue }) => {
+  assert.ok(
+    (issue.area || '').includes('Action Area III') ||
+    (issue.campus || '').includes('Action Area III') ||
+    (issue.location || '').includes('Action Area III')
+  );
+});
+const area3Clusters = clusterMappedIssues(area3Issues, 13);
+const totalArea3InClusters = area3Clusters.reduce((acc, c) => acc + (c.isCluster ? c.count : 1), 0);
+assert.equal(totalArea3InClusters, area3Issues.length, 'Action Area III cluster items count must match filtered count');
+
+// 6e: Search query filtering
+const bbgSearchIssues = filterMappedIssues(preparedMappedIssues, { searchQuery: 'Biswa Bangla Gate' });
+assert.ok(bbgSearchIssues.length > 0, 'Search for Biswa Bangla Gate must return matching issues');
+bbgSearchIssues.forEach(({ issue }) => {
+  const text = `${issue.title} ${issue.location} ${issue.building} ${issue.neighbourhood}`.toLowerCase();
+  assert.ok(text.includes('biswa bangla gate'), 'Search results must contain query');
+});
+
+// 6f: Threshold progression validation (more zoom = unclustering)
+assert.equal(getClusterThreshold(16), 0, 'Zoom 16 threshold should be 0px');
+assert.equal(getClusterThreshold(15), 8, 'Zoom 15 threshold should be 8px');
+assert.equal(getClusterThreshold(14), 14, 'Zoom 14 threshold should be 14px');
+assert.equal(getClusterThreshold(13), 18, 'Zoom 13 threshold should be 18px');
+assert.equal(getClusterThreshold(12), 22, 'Zoom 12 threshold should be 22px');
+assert.equal(getClusterThreshold(11), 28, 'Zoom 11 threshold should be 28px');
+
+const zoom12Clusters = clusterMappedIssues(preparedMappedIssues, 12);
+const zoom13Clusters = clusterMappedIssues(preparedMappedIssues, 13);
+const zoom14Clusters = clusterMappedIssues(preparedMappedIssues, 14);
+const zoom16Clusters = clusterMappedIssues(preparedMappedIssues, 16);
+
+// At zoom 16, threshold is 0 so all items must be rendered as individual markers
+assert.equal(zoom16Clusters.every((c) => !c.isCluster), true, 'Zoom 16 must be 100% individual markers');
+assert.equal(zoom16Clusters.length, preparedMappedIssues.length, 'Zoom 16 must have individual marker for every issue');
+assert.ok(zoom13Clusters.length > zoom12Clusters.length, 'Zoom 13 must show more separated objects than Zoom 12');
+assert.ok(zoom14Clusters.length > zoom13Clusters.length, 'Zoom 14 must show more separated objects than Zoom 13');
+
+console.log('  ✓ Marker and cluster counts accurately respect category, status, priority, area, and search filters');
+console.log('  ✓ Progressive spatial unclustering verified across zoom levels (zoom 12 -> 13 -> 14 -> 16)');
 
 console.log('\n=== ALL GEOGRAPHIC MAP TESTS PASSED ===\n');
 

@@ -6,8 +6,8 @@ export default function StatusBadge({ status, size = 'sm' }) {
     Open: 'bg-amber-50 text-amber-800 border-amber-200',
     'In Progress': 'bg-sky-50 text-sky-800 border-sky-200',
     'Resolution Submitted': 'bg-purple-50 text-purple-800 border-purple-200',
-    'Awaiting Verification': 'bg-purple-50 text-purple-800 border-purple-200',
-    Resolved: 'bg-slate-100 text-slate-700 border-slate-200',
+    'Awaiting Verification': 'bg-purple-50 text-purple-800 border-purple-200/80',
+    Resolved: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
   };
 
   const dots = {
@@ -15,14 +15,14 @@ export default function StatusBadge({ status, size = 'sm' }) {
     'In Progress': 'bg-sky-500',
     'Resolution Submitted': 'bg-purple-500',
     'Awaiting Verification': 'bg-purple-500',
-    Resolved: 'bg-slate-400',
+    Resolved: 'bg-emerald-600',
   };
 
   const badgeStyle = styles[status] || styles[displayLabel] || 'bg-slate-100 text-slate-700 border-slate-200';
   const dotStyle = dots[status] || dots[displayLabel] || 'bg-slate-400';
 
   const sizeClasses = size === 'md'
-    ? 'px-2.5 py-1 text-xs'
+    ? 'px-2.5 py-0.5 text-xs'
     : 'px-2 py-0.5 text-[11px]';
 
   return (

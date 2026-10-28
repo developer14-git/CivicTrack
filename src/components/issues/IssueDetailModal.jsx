@@ -173,7 +173,7 @@ export default function IssueDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="issue-modal-title"
@@ -182,22 +182,22 @@ export default function IssueDetailModal({
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Dialog */}
-      <div className="relative bg-white rounded-xl shadow-xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/90 max-w-2xl w-full max-h-[90vh] flex flex-col text-left overflow-hidden z-10">
         {/* Header */}
-        <div className="shrink-0 bg-white border-b border-slate-200 px-5 py-4 flex items-center justify-between gap-3">
+        <div className="shrink-0 bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+            <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100/90 px-2.5 py-1 rounded-md border border-slate-200/70">
               {issue.id}
             </span>
             <StatusBadge status={issue.status} size="md" />
             {issue.priority && <PriorityBadge priority={issue.priority} size="md" />}
             {issue.isDemoReport && (
-              <span className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+              <span className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-md">
                 Sample Demo Report
               </span>
             )}
             {issue.isChallenged && (
-              <span className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200/80 px-2.5 py-1 rounded-md">
                 Challenged
               </span>
             )}
@@ -207,7 +207,7 @@ export default function IssueDetailModal({
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -421,17 +421,17 @@ export default function IssueDetailModal({
             </h3>
 
             {/* General Action: Endorsement */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/90">
               <div className="text-xs text-slate-600">
                 <span className="font-semibold text-slate-800">{issue.supporters || 0} citizens</span> have endorsed this report
               </div>
               <button
                 type="button"
                 onClick={() => onToggleSupport?.(issue.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
                   issue.supportedByMe
-                    ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                    ? 'bg-emerald-50 text-emerald-900 border-emerald-300 shadow-2xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 <ThumbsUp className={`w-3.5 h-3.5 ${issue.supportedByMe ? 'fill-emerald-800 text-emerald-800' : ''}`} />
@@ -441,12 +441,12 @@ export default function IssueDetailModal({
 
             {/* Independent Verification Workflow (When Awaiting Verification) */}
             {issue.status === 'Resolution Submitted' && (
-              <div className="bg-purple-50/70 border border-purple-200 rounded-lg p-4 space-y-3">
+              <div className="bg-purple-50/60 border border-purple-200/80 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-purple-950 uppercase tracking-wide">
                     Independent Verification
                   </span>
-                  <span className="text-[11px] text-purple-800">Citizen & Community Sign-Off</span>
+                  <span className="text-[11px] text-purple-800 font-medium">Citizen & Community Sign-Off</span>
                 </div>
                 <p className="text-xs text-purple-900/90 leading-relaxed">
                   Has this issue been adequately fixed? Verify closure or request rework.
@@ -456,7 +456,7 @@ export default function IssueDetailModal({
                   <button
                     type="button"
                     onClick={handleVerifySubmit}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                   >
                     Verify & Close Issue
                   </button>
@@ -464,7 +464,7 @@ export default function IssueDetailModal({
                   <button
                     type="button"
                     onClick={() => setShowRejectForm(!showRejectForm)}
-                    className="px-3 py-1.5 text-xs font-semibold text-rose-800 bg-white border border-rose-300 hover:bg-rose-50 rounded-md transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-800 bg-white border border-rose-300 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                   >
                     Request Rework
                   </button>
@@ -472,7 +472,7 @@ export default function IssueDetailModal({
 
                 {/* Reject & Request Rework Form */}
                 {showRejectForm && (
-                  <form onSubmit={handleRejectSubmit} className="pt-3 border-t border-purple-200 space-y-3">
+                  <form onSubmit={handleRejectSubmit} className="pt-3 border-t border-purple-200/80 space-y-3">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
                         Reason for Rework
@@ -480,7 +480,7 @@ export default function IssueDetailModal({
                       <select
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
-                        className="w-full text-xs p-2 border border-slate-300 rounded bg-white"
+                        className="w-full text-xs p-2 border border-slate-200/90 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                       >
                         {REJECTION_REASONS.map((r) => (
                           <option key={r} value={r}>{r}</option>
@@ -500,7 +500,7 @@ export default function IssueDetailModal({
                           if (rejectionError) setRejectionError(null);
                         }}
                         placeholder="Explain what is still broken or incomplete..."
-                        className="w-full text-xs p-2 border border-slate-300 rounded"
+                        className="w-full text-xs p-2 border border-slate-200/90 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500"
                       />
                       {rejectionError && (
                         <p className="text-xs text-rose-600 mt-1">{rejectionError}</p>
@@ -510,14 +510,14 @@ export default function IssueDetailModal({
                     <div className="flex items-center gap-2">
                       <button
                         type="submit"
-                        className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-700 hover:bg-rose-800 rounded"
+                        className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                       >
                         Send Back to In Progress
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowRejectForm(false)}
-                        className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded"
+                        className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -535,20 +535,20 @@ export default function IssueDetailModal({
                     type="button"
                     onClick={() => setShowChallengeForm(true)}
                     disabled={issue.challengedByMe}
-                    className="text-xs font-medium text-slate-600 hover:text-rose-700 flex items-center gap-1.5 disabled:opacity-50"
+                    className="text-xs font-medium text-slate-600 hover:text-rose-700 flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                   >
                     <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                     <span>{issue.challengedByMe ? 'You have challenged this repair' : 'Notice a problem with this repair? File a Citizen Challenge'}</span>
                   </button>
                 ) : (
-                  <form onSubmit={handleChallengeSubmit} className="bg-rose-50/60 border border-rose-200 rounded-lg p-3.5 space-y-3 text-xs">
-                    <span className="font-bold text-rose-900 block">File a Citizen Challenge</span>
+                  <form onSubmit={handleChallengeSubmit} className="bg-rose-50/70 border border-rose-200/80 rounded-xl p-4 space-y-3 text-xs">
+                    <span className="font-bold text-rose-950 block">File a Citizen Challenge</span>
                     <div>
                       <label className="block font-semibold text-slate-700 mb-1">Reason</label>
                       <select
                         value={challengeReason}
                         onChange={(e) => setChallengeReason(e.target.value)}
-                        className="w-full text-xs p-2 border border-slate-300 rounded bg-white"
+                        className="w-full text-xs p-2 border border-slate-200/90 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"
                       >
                         {CHALLENGE_REASONS.map((r) => (
                           <option key={r} value={r}>{r}</option>
@@ -567,21 +567,21 @@ export default function IssueDetailModal({
                           if (challengeError) setChallengeError(null);
                         }}
                         placeholder="Why is this repair unsatisfactory?"
-                        className="w-full text-xs p-2 border border-slate-300 rounded"
+                        className="w-full text-xs p-2 border border-slate-200/90 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500"
                       />
                       {challengeError && <p className="text-xs text-rose-600 mt-1">{challengeError}</p>}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         type="submit"
-                        className="px-3 py-1.5 font-semibold text-white bg-rose-700 hover:bg-rose-800 rounded"
+                        className="px-3.5 py-1.5 font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                       >
                         Submit Challenge
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowChallengeForm(false)}
-                        className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded"
+                        className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -593,7 +593,7 @@ export default function IssueDetailModal({
 
             {/* Staff Workflow Actions (When in Staff Mode) */}
             {isStaffMode && (
-              <div className="bg-amber-50/80 border border-amber-300 rounded-lg p-4 space-y-3">
+              <div className="bg-amber-50/70 border border-amber-200/90 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950 uppercase tracking-wider">
                   <Wrench className="w-3.5 h-3.5 text-amber-700" />
                   <span>Demo Staff Actions</span>
@@ -603,7 +603,7 @@ export default function IssueDetailModal({
                   <button
                     type="button"
                     onClick={() => onStartWork?.(issue.id)}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-800 hover:bg-amber-900 rounded-md transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-700 hover:bg-amber-800 rounded-lg shadow-xs transition-colors cursor-pointer"
                   >
                     Start Work (Move to In Progress)
                   </button>
@@ -615,7 +615,7 @@ export default function IssueDetailModal({
                       <button
                         type="button"
                         onClick={() => setShowResolutionForm(true)}
-                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md transition-colors"
+                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-xs transition-colors cursor-pointer"
                       >
                         Submit Proposed Resolution
                       </button>
@@ -633,7 +633,7 @@ export default function IssueDetailModal({
                               if (resolutionError) setResolutionError(null);
                             }}
                             placeholder="Describe the repair completed on site..."
-                            className="w-full text-xs p-2 border border-slate-300 rounded"
+                            className="w-full text-xs p-2 border border-slate-200/90 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                           />
                           {resolutionError && (
                             <p className="text-xs text-rose-600 mt-1">{resolutionError}</p>
@@ -655,14 +655,14 @@ export default function IssueDetailModal({
                         <div className="flex items-center gap-2">
                           <button
                             type="submit"
-                            className="px-3.5 py-1.5 font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded"
+                            className="px-3.5 py-1.5 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-xs transition-colors cursor-pointer"
                           >
                             Submit for Verification
                           </button>
                           <button
                             type="button"
                             onClick={() => setShowResolutionForm(false)}
-                            className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded"
+                            className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -678,7 +678,7 @@ export default function IssueDetailModal({
                       <button
                         type="button"
                         onClick={() => setShowReopenForm(true)}
-                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-800 hover:bg-amber-900 rounded-md transition-colors"
+                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-700 hover:bg-amber-800 rounded-lg shadow-xs transition-colors cursor-pointer"
                       >
                         Acknowledge Challenge & Reopen for Rework
                       </button>
@@ -689,19 +689,19 @@ export default function IssueDetailModal({
                           value={staffReopenNote}
                           onChange={(e) => setStaffReopenNote(e.target.value)}
                           placeholder="Staff note regarding rework..."
-                          className="w-full text-xs p-2 border border-slate-300 rounded"
+                          className="w-full text-xs p-2 border border-slate-200/90 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
                         />
                         <div className="flex items-center gap-2">
                           <button
                             type="submit"
-                            className="px-3 py-1.5 font-semibold text-white bg-amber-800 hover:bg-amber-900 rounded"
+                            className="px-3.5 py-1.5 font-semibold text-white bg-amber-700 hover:bg-amber-800 rounded-lg shadow-xs transition-colors cursor-pointer"
                           >
                             Reopen Ticket
                           </button>
                           <button
                             type="button"
                             onClick={() => setShowReopenForm(false)}
-                            className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded"
+                            className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -716,11 +716,11 @@ export default function IssueDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 bg-slate-50 border-t border-slate-200 px-5 py-3 flex items-center justify-end">
+        <div className="shrink-0 bg-slate-50/80 border-t border-slate-200/80 px-6 py-3.5 flex items-center justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 rounded transition-colors"
+            className="px-4 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/70 rounded-lg transition-colors cursor-pointer"
           >
             Close
           </button>

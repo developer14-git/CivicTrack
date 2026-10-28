@@ -200,8 +200,8 @@ export default function AccountabilityView({
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Page Header */}
-      <div className="pb-3 border-b border-slate-200 text-left">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 leading-tight">
+      <div className="pb-3.5 border-b border-slate-200/90 text-left">
+        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">
           Accountability Analytics
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -211,57 +211,57 @@ export default function AccountabilityView({
 
       {/* 1. Primary Metrics Row (4 Compact Cards) */}
       <section aria-label="Key Accountability Metrics">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Metric 1: Total Reports */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-lg border border-slate-200 text-left">
-            <span className="text-xs font-medium text-slate-500 block">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Total Reports
             </span>
-            <div className="text-2xl font-bold text-slate-900 mt-1">
+            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
               {metrics.total}
             </div>
           </div>
 
           {/* Metric 2: Open Issues */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-lg border border-slate-200 text-left">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Open Issues
               </span>
-              <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden="true" />
+              <span className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-100" aria-hidden="true" />
             </div>
-            <div className="text-2xl font-bold text-slate-900 mt-1">
+            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
               {metrics.open}
             </div>
           </div>
 
           {/* Metric 3: Awaiting Verification */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-lg border border-slate-200 text-left">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Awaiting Verification
               </span>
-              <span className="w-2 h-2 rounded-full bg-purple-500" aria-hidden="true" />
+              <span className="w-2 h-2 rounded-full bg-purple-500 ring-2 ring-purple-100" aria-hidden="true" />
             </div>
-            <div className="text-2xl font-bold text-slate-900 mt-1">
+            <div className="text-3xl font-extrabold text-slate-900 mt-1 leading-none">
               {metrics.submitted}
             </div>
           </div>
 
           {/* Metric 4: Overdue */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-lg border border-slate-200 text-left">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 text-left shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Overdue
               </span>
               {metrics.overdueIssues.length > 0 ? (
-                <span className="w-2 h-2 rounded-full bg-rose-500" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-100" aria-hidden="true" />
               ) : (
-                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-100" aria-hidden="true" />
               )}
             </div>
             <div
-              className={`text-2xl font-bold mt-1 ${
+              className={`text-3xl font-extrabold mt-1 leading-none ${
                 metrics.overdueIssues.length > 0 ? 'text-rose-700' : 'text-slate-900'
               }`}
             >
@@ -274,7 +274,7 @@ export default function AccountabilityView({
       {/* 2. Secondary Summary Section */}
       <section
         aria-label="Secondary Metrics"
-        className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-3.5"
+        className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-2xs"
       >
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
           {/* In Progress */}
@@ -332,7 +332,7 @@ export default function AccountabilityView({
 
       {/* 3. Endorsement Information (Compact & Neutral) */}
       <section aria-label="Endorsement Summary">
-        <div className="bg-white border border-slate-200 rounded-lg px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600">
+        <div className="bg-white border border-slate-200/90 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600 shadow-2xs">
           <div className="flex items-center gap-2">
             <ThumbsUp className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
             <span>
@@ -349,13 +349,13 @@ export default function AccountabilityView({
       <section aria-label="Issue Breakdowns">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Panel 1: Lifecycle Status Distribution */}
-          <div className="bg-white rounded-lg border border-slate-200 p-4 sm:p-5 text-left flex flex-col justify-between">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="text-sm font-semibold text-slate-900">
+                <h2 className="text-sm font-bold text-slate-900">
                   Lifecycle Status
                 </h2>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 font-medium">
                   {metrics.total} Total Issues
                 </span>
               </div>
@@ -363,9 +363,9 @@ export default function AccountabilityView({
               <div className="space-y-3 pt-3">
                 {statusBreakdown.map((item) => (
                   <div key={item.label}>
-                    <div className="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                       <span>{item.label}</span>
-                      <span className="text-slate-500">
+                      <span className="text-slate-500 font-medium">
                         {item.count} ({item.pct}%)
                       </span>
                     </div>
@@ -382,13 +382,13 @@ export default function AccountabilityView({
           </div>
 
           {/* Panel 2: Civic Reports by Category */}
-          <div className="bg-white rounded-lg border border-slate-200 p-4 sm:p-5 text-left flex flex-col justify-between">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="text-sm font-semibold text-slate-900">
+                <h2 className="text-sm font-bold text-slate-900">
                   Reports by Category
                 </h2>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 font-medium">
                   {Object.keys(metrics.categoryCounts).length} Categories
                 </span>
               </div>
@@ -396,9 +396,9 @@ export default function AccountabilityView({
               <div className="space-y-3 pt-3">
                 {categoryBreakdown.map((item) => (
                   <div key={item.label}>
-                    <div className="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                       <span className="truncate max-w-[150px]">{item.label}</span>
-                      <span className="text-slate-500 shrink-0">
+                      <span className="text-slate-500 font-medium shrink-0">
                         {item.count} ({item.pct}%)
                       </span>
                     </div>
@@ -415,13 +415,13 @@ export default function AccountabilityView({
           </div>
 
           {/* Panel 3: Location Breakdown by Action Area */}
-          <div className="bg-white rounded-lg border border-slate-200 p-4 sm:p-5 text-left flex flex-col justify-between">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 text-left flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="text-sm font-semibold text-slate-900">
+                <h2 className="text-sm font-bold text-slate-900">
                   Action Area Breakdown
                 </h2>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 font-medium">
                   New Town Sectors
                 </span>
               </div>
@@ -429,9 +429,9 @@ export default function AccountabilityView({
               <div className="space-y-3 pt-3">
                 {locationBreakdown.map((item) => (
                   <div key={item.label}>
-                    <div className="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                       <span className="truncate max-w-[150px]">{item.label}</span>
-                      <span className="text-slate-500 shrink-0">
+                      <span className="text-slate-500 font-medium shrink-0">
                         {item.count} ({item.pct}%)
                       </span>
                     </div>
@@ -451,11 +451,11 @@ export default function AccountabilityView({
 
       {/* 5. Overdue Issues (Compact, Readable List) */}
       <section aria-label="Overdue issues" className="text-left space-y-2.5">
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 pb-2 border-b border-slate-200/80">
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 pb-2 border-b border-slate-200/90">
           <div className="flex items-center gap-2.5">
-            <h2 className="text-base font-semibold text-slate-900 tracking-tight">Overdue issues</h2>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">Overdue issues</h2>
             {metrics.sortedOverdueIssues.length > 0 && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-slate-100 text-slate-600 border border-slate-200/80">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-50 text-rose-700 border border-rose-200">
                 {metrics.sortedOverdueIssues.length}
               </span>
             )}
@@ -466,9 +466,9 @@ export default function AccountabilityView({
         </div>
 
         {metrics.sortedOverdueIssues.length > 0 ? (
-          <div className="bg-white rounded-lg border border-slate-200/80 overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-2xs">
             {/* Desktop Column Headers */}
-            <div className="hidden md:flex items-center justify-between px-4 py-2 bg-slate-50/70 border-b border-slate-200/80 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+            <div className="hidden md:flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
               <div className="flex-1 min-w-0 pr-4">Issue</div>
               <div className="flex items-center gap-4 shrink-0">
                 <div className="w-20 shrink-0 text-left">Priority</div>
@@ -489,16 +489,16 @@ export default function AccountabilityView({
                   <div
                     key={issue.id}
                     onClick={() => onOpenIssueDetail(issue.id)}
-                    className="group px-4 py-3 hover:bg-slate-50/70 transition-colors cursor-pointer border-b border-slate-100 last:border-b-0 flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4 text-xs"
+                    className="group px-4 py-3 hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-100 last:border-b-0 flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4 text-xs"
                   >
                     {/* Issue Details: ID, Title, and Location */}
                     <div className="min-w-0 flex-1 md:pr-4">
                       <div className="flex items-baseline gap-2">
-                        <span className="font-mono text-xs text-slate-400 shrink-0 select-all">
+                        <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded shrink-0 select-all">
                           #{issue.id}
                         </span>
                         <h3
-                          className="text-sm font-semibold text-slate-900 group-hover:text-emerald-950 transition-colors line-clamp-2 md:truncate"
+                          className="text-sm font-semibold text-slate-900 group-hover:text-emerald-900 transition-colors line-clamp-2 md:truncate"
                           title={issue.title}
                         >
                           {issue.title}
@@ -515,7 +515,7 @@ export default function AccountabilityView({
                       <div className="flex items-center gap-3 md:gap-4">
                         {/* Priority */}
                         <div className="md:w-20 shrink-0 flex items-center">
-                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-700">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-700 font-medium">
                             <span
                               className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                                 issue.priority === 'High'
@@ -526,20 +526,18 @@ export default function AccountabilityView({
                               }`}
                               aria-hidden="true"
                             />
-                            <span className="font-normal">{issue.priority}</span>
+                            <span>{issue.priority}</span>
                           </span>
                         </div>
 
                         {/* Status */}
                         <div className="md:w-28 shrink-0 flex items-center">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-700 border border-slate-200/80">
-                            {issue.status}
-                          </span>
+                          <StatusBadge status={issue.status} size="xs" />
                         </div>
 
                         {/* Overdue Duration */}
                         <div className="md:w-28 shrink-0 md:text-right flex items-center md:justify-end">
-                          <span className="text-xs font-mono font-medium text-rose-600">
+                          <span className="text-xs font-mono font-bold text-rose-600">
                             {overdueDisplay}
                           </span>
                         </div>
@@ -553,7 +551,7 @@ export default function AccountabilityView({
                             e.stopPropagation();
                             onOpenIssueDetail(issue.id);
                           }}
-                          className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-900 group-hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 rounded py-0.5"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 group-hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 rounded py-0.5 cursor-pointer"
                           aria-label={`View issue #${issue.id}: ${issue.title}`}
                         >
                           <span>View issue</span>
@@ -567,11 +565,11 @@ export default function AccountabilityView({
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-slate-200/80 p-8 text-center text-xs text-slate-500">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-8 text-center text-xs text-slate-500 shadow-2xs">
             <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mx-auto mb-2.5">
               <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             </div>
-            <p className="font-medium text-slate-800 text-sm">No overdue issues</p>
+            <p className="font-semibold text-slate-800 text-sm">No overdue issues</p>
             <p className="text-xs text-slate-500 mt-0.5">All active reports are currently within their target SLA resolution windows.</p>
           </div>
         )}
@@ -579,18 +577,18 @@ export default function AccountabilityView({
 
       {/* 6. Oversight & Verification (Single Clean Section, 3 Compact Columns) */}
       <section aria-label="Accountability Oversight" className="text-left space-y-2">
-        <div className="pb-1.5 border-b border-slate-200">
-          <h2 className="text-base font-semibold text-slate-900">Oversight & Verification</h2>
+        <div className="pb-1.5 border-b border-slate-200/90">
+          <h2 className="text-base font-bold text-slate-900">Oversight & Verification</h2>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 divide-y md:divide-y-0 md:divide-x divide-slate-100 grid grid-cols-1 md:grid-cols-3">
+        <div className="bg-white rounded-xl border border-slate-200/90 divide-y md:divide-y-0 md:divide-x divide-slate-100 grid grid-cols-1 md:grid-cols-3 shadow-2xs overflow-hidden">
           {/* Column 1: High-Priority Active */}
-          <div className="p-3.5 space-y-2 text-left">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <div className="p-4 space-y-2.5 text-left">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                 High-Priority Active
               </h3>
-              <span className="text-xs font-bold text-slate-600">
+              <span className="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-full">
                 {metrics.highPriorityActive.length}
               </span>
             </div>
@@ -601,32 +599,32 @@ export default function AccountabilityView({
                   <div
                     key={issue.id}
                     onClick={() => onOpenIssueDetail(issue.id)}
-                    className="py-2 px-1 hover:bg-slate-50 rounded transition-colors cursor-pointer flex items-center justify-between gap-2"
+                    className="py-2.5 px-1 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-slate-400 mr-1.5 shrink-0">
+                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded mr-1.5 shrink-0">
                         #{issue.id}
                       </span>
-                      <span className="text-xs font-medium text-slate-900 leading-snug break-words">
+                      <span className="text-xs font-semibold text-slate-900 leading-snug break-words">
                         {issue.title}
                       </span>
                     </div>
-                    <PriorityBadge priority={issue.priority} size="sm" />
+                    <PriorityBadge priority={issue.priority} size="xs" />
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 py-3 italic">No high-priority active issues.</p>
+              <p className="text-xs text-slate-400 py-4 italic text-center">No high-priority active issues.</p>
             )}
           </div>
 
           {/* Column 2: Awaiting Verification */}
-          <div className="p-3.5 space-y-2 text-left">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <div className="p-4 space-y-2.5 text-left">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                 Awaiting Verification
               </h3>
-              <span className="text-xs font-bold text-slate-600">
+              <span className="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-full">
                 {metrics.awaitingVerification.length}
               </span>
             </div>
@@ -637,32 +635,32 @@ export default function AccountabilityView({
                   <div
                     key={issue.id}
                     onClick={() => onOpenIssueDetail(issue.id)}
-                    className="py-2 px-1 hover:bg-slate-50 rounded transition-colors cursor-pointer flex items-center justify-between gap-2"
+                    className="py-2.5 px-1 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-slate-400 mr-1.5 shrink-0">
+                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded mr-1.5 shrink-0">
                         #{issue.id}
                       </span>
-                      <span className="text-xs font-medium text-slate-900 leading-snug break-words">
+                      <span className="text-xs font-semibold text-slate-900 leading-snug break-words">
                         {issue.title}
                       </span>
                     </div>
-                    <StatusBadge status={issue.status} size="sm" />
+                    <StatusBadge status={issue.status} size="xs" />
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 py-3 italic">No reports awaiting verification.</p>
+              <p className="text-xs text-slate-400 py-4 italic text-center">No reports awaiting verification.</p>
             )}
           </div>
 
           {/* Column 3: Challenges & Rejections */}
-          <div className="p-3.5 space-y-2 text-left">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <div className="p-4 space-y-2.5 text-left">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                 Challenges & Rejections
               </h3>
-              <span className="text-xs font-bold text-slate-600">
+              <span className="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-full">
                 {metrics.challengedIssues.length + metrics.rejectedIssuesList.length}
               </span>
             </div>
@@ -673,17 +671,17 @@ export default function AccountabilityView({
                   <div
                     key={`ch-${issue.id}`}
                     onClick={() => onOpenIssueDetail(issue.id)}
-                    className="py-2 px-1 hover:bg-slate-50 rounded transition-colors cursor-pointer flex items-center justify-between gap-2"
+                    className="py-2.5 px-1 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-slate-400 mr-1.5 shrink-0">
+                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded mr-1.5 shrink-0">
                         #{issue.id}
                       </span>
-                      <span className="text-xs font-medium text-slate-900 leading-snug break-words">
+                      <span className="text-xs font-semibold text-slate-900 leading-snug break-words">
                         {issue.title}
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold text-rose-800 bg-rose-50 border border-rose-200 px-1.5 py-0.2 rounded shrink-0">
+                    <span className="text-[10px] font-bold text-rose-800 bg-rose-50 border border-rose-200/80 px-1.5 py-0.5 rounded-md shrink-0">
                       Challenged
                     </span>
                   </div>
@@ -693,24 +691,24 @@ export default function AccountabilityView({
                   <div
                     key={`rej-${issue.id}`}
                     onClick={() => onOpenIssueDetail(issue.id)}
-                    className="py-2 px-1 hover:bg-slate-50 rounded transition-colors cursor-pointer flex items-center justify-between gap-2"
+                    className="py-2.5 px-1 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-xs text-slate-400 mr-1.5 shrink-0">
+                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded mr-1.5 shrink-0">
                         #{issue.id}
                       </span>
-                      <span className="text-xs font-medium text-slate-900 leading-snug break-words">
+                      <span className="text-xs font-semibold text-slate-900 leading-snug break-words">
                         {issue.title}
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded shrink-0">
+                    <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">
                       Rework
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 py-3 italic">No challenged resolutions.</p>
+              <p className="text-xs text-slate-400 py-4 italic text-center">No challenged resolutions.</p>
             )}
           </div>
         </div>
@@ -718,18 +716,18 @@ export default function AccountabilityView({
 
       {/* 7. Recent Audit Activity (Normal page flow, no nested scrollbar) */}
       <section aria-label="Recent Audit Activity" className="text-left space-y-2">
-        <div className="flex items-center justify-between pb-1.5 border-b border-slate-200">
+        <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/90">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-slate-900">Recent Audit Activity</h2>
-            <span className="text-xs text-slate-400">
-              ({metrics.allEvents.length} events)
+            <h2 className="text-base font-bold text-slate-900">Recent Audit Activity</h2>
+            <span className="text-xs text-slate-500 font-medium">
+              ({metrics.allEvents.length} events recorded)
             </span>
           </div>
           {metrics.allEvents.length > 5 && (
             <button
               type="button"
               onClick={() => setShowAllEvents(!showAllEvents)}
-              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 focus:outline-none focus-visible:underline"
+              className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 focus:outline-none focus-visible:underline cursor-pointer transition-colors"
             >
               {showAllEvents ? 'Show less' : `Show all (${metrics.allEvents.length})`}
             </button>
@@ -737,15 +735,15 @@ export default function AccountabilityView({
         </div>
 
         {metrics.allEvents.length > 0 ? (
-          <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+          <div className="bg-white rounded-xl border border-slate-200/90 divide-y divide-slate-100 shadow-2xs overflow-hidden">
             {displayedEvents.map((event) => (
               <div
                 key={event.eventId}
                 onClick={() => onOpenIssueDetail(event.issueId)}
-                className="py-2.5 px-3 sm:px-4 hover:bg-slate-50 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs"
+                className="py-3 px-3.5 sm:px-4 hover:bg-slate-50 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs"
               >
                 <div className="min-w-0 flex-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <span className="font-mono text-xs font-semibold text-slate-400 shrink-0">
+                  <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded shrink-0">
                     #{event.issueId}
                   </span>
                   <span className="font-semibold text-slate-900">{event.title}</span>
@@ -766,7 +764,7 @@ export default function AccountabilityView({
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-slate-200 p-4 text-center text-xs text-slate-500">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-6 text-center text-xs text-slate-500 shadow-2xs">
             No audit activity recorded.
           </div>
         )}
@@ -774,16 +772,16 @@ export default function AccountabilityView({
 
       {/* 8. How Accountability Works (Compact Collapsible) */}
       <section aria-label="Accountability Rules" className="text-left">
-        <div className="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-slate-200/90 rounded-xl overflow-hidden shadow-2xs">
           <button
             type="button"
             onClick={() => setIsMethodologyOpen(!isMethodologyOpen)}
-            className="w-full p-3 sm:px-4 flex items-center justify-between text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/60 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
+            className="w-full p-3.5 sm:px-4 flex items-center justify-between text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 cursor-pointer"
             aria-expanded={isMethodologyOpen}
           >
             <div className="flex items-center gap-2">
-              <Info className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
-              <span>How accountability works</span>
+              <Info className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
+              <span className="font-bold text-slate-800">How accountability works</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-slate-500 font-normal">
               <span>{isMethodologyOpen ? 'Hide details' : 'Show details'}</span>
@@ -796,8 +794,8 @@ export default function AccountabilityView({
           </button>
 
           {isMethodologyOpen && (
-            <div className="p-4 pt-1 border-t border-slate-200 space-y-3 text-xs text-slate-600">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed pt-2">
+            <div className="p-4 pt-2 border-t border-slate-100 space-y-3 text-xs text-slate-600 bg-slate-50/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed pt-1">
                 <div>
                   <strong className="text-slate-900 block mb-0.5">Illustrative SLA Targets</strong>
                   <p className="text-[11px] text-slate-500">

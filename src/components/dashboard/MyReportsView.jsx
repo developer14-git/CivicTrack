@@ -30,12 +30,25 @@ export default function MyReportsView({
     { id: 'Resolved', label: 'Resolved' },
   ];
 
+  // Compute quick personal status counts
+  const personalCounts = useMemo(() => {
+    return {
+      total: myIssues.length,
+      open: myIssues.filter((i) => i.status === 'Open').length,
+      inProgress: myIssues.filter((i) => i.status === 'In Progress').length,
+      submitted: myIssues.filter(
+        (i) => i.status === 'Resolution Submitted' || i.status === 'Awaiting Verification'
+      ).length,
+      resolved: myIssues.filter((i) => i.status === 'Resolved').length,
+    };
+  }, [myIssues]);
+
   return (
     <div className="space-y-6 animate-in fade-in py-2 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/90">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             My Reports
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -46,12 +59,42 @@ export default function MyReportsView({
         <button
           type="button"
           onClick={onOpenReportModal}
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded transition-colors"
+          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 rounded-lg shadow-xs hover:shadow-sm transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Report a Problem</span>
         </button>
       </div>
+
+      {/* Personal Summary Stats */}
+      {myIssues.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+              My Total Reports
+            </span>
+            <div className="text-2xl font-extrabold text-slate-900 leading-none">{personalCounts.total}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+            <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block mb-1">
+              In Review / Open
+            </span>
+            <div className="text-2xl font-extrabold text-slate-900 leading-none">{personalCounts.open + personalCounts.inProgress}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+            <span className="text-[11px] font-bold text-purple-600 uppercase tracking-wider block mb-1">
+              Awaiting Verification
+            </span>
+            <div className="text-2xl font-extrabold text-slate-900 leading-none">{personalCounts.submitted}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block mb-1">
+              Verified Resolved
+            </span>
+            <div className="text-2xl font-extrabold text-emerald-700 leading-none">{personalCounts.resolved}</div>
+          </div>
+        </div>
+      )}
 
       {/* Clean Status Filter Tabs */}
       {myIssues.length > 0 && (
@@ -63,10 +106,10 @@ export default function MyReportsView({
                 key={tab.id}
                 type="button"
                 onClick={() => setFilterStatus(tab.id)}
-                className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all border cursor-pointer ${
                   isActive
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-[#07251f] text-white border-[#0f3d33] shadow-xs'
+                    : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 {tab.label}
@@ -91,7 +134,7 @@ export default function MyReportsView({
           ))}
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-lg p-10 text-center max-w-md mx-auto space-y-3">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-10 text-center max-w-md mx-auto space-y-3 shadow-2xs">
           <p className="text-sm text-slate-600">
             {myIssues.length === 0
               ? "You haven't reported any issues yet."
@@ -100,7 +143,7 @@ export default function MyReportsView({
           <button
             type="button"
             onClick={myIssues.length === 0 ? onOpenReportModal : () => setFilterStatus('All')}
-            className="px-4 py-2 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded transition-colors"
+            className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors cursor-pointer"
           >
             {myIssues.length === 0 ? 'Report an Issue' : 'Show All My Reports'}
           </button>

@@ -582,7 +582,7 @@ export default function LocationPicker({
             }}
             placeholder="Search landmark, road, or area to pan map..."
             disabled={disabled}
-            className="w-full pl-8 pr-7 py-1.5 text-xs rounded-md border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+            className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-slate-200/90 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-colors"
           />
           {searchQuery && (
             <button
@@ -602,10 +602,10 @@ export default function LocationPicker({
 
           {/* Autocomplete Results Dropdown with Navigation vs Pinning Distinction */}
           {isSearchOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 z-[1500] bg-white border border-slate-200 rounded-md shadow-xl max-h-60 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 z-[1500] bg-white border border-slate-200/90 rounded-xl shadow-xl max-h-60 overflow-y-auto">
               {isSearching && searchResults.length === 0 ? (
                 <div className="px-3 py-3 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 text-emerald-700 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-emerald-600 animate-spin" />
                   <span>Searching locations in New Town, Kolkata...</span>
                 </div>
               ) : !isSearching && searchResults.length === 0 && searchQuery.trim().length >= 2 ? (
@@ -651,7 +651,7 @@ export default function LocationPicker({
                           type="button"
                           onClick={() => handleNavigateToLandmark(res)}
                           title="Pan map to this landmark"
-                          className="px-2 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 cursor-pointer inline-flex items-center gap-1"
+                          className="px-2 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md border border-slate-200 cursor-pointer inline-flex items-center gap-1"
                         >
                           <Eye className="w-3 h-3 text-slate-600" />
                           <span>Pan Map</span>
@@ -660,7 +660,7 @@ export default function LocationPicker({
                           type="button"
                           onClick={() => handlePinAtLandmark(res)}
                           title="Set pin directly at this landmark"
-                          className="px-2 py-1 text-[10px] font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded shadow-2xs cursor-pointer inline-flex items-center gap-1"
+                          className="px-2 py-1 text-[10px] font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-md shadow-2xs cursor-pointer inline-flex items-center gap-1"
                         >
                           <MapPin className="w-3 h-3" />
                           <span>Pin Here</span>
@@ -680,7 +680,7 @@ export default function LocationPicker({
           onClick={handleUseCurrentLocation}
           disabled={disabled || isLocating}
           title="Detect and use current device location"
-          className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md font-medium inline-flex items-center gap-1 shrink-0 transition-colors cursor-pointer disabled:opacity-50"
+          className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 rounded-lg font-medium inline-flex items-center gap-1 shrink-0 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
         >
           {isLocating ? (
             <Loader2 className="w-3.5 h-3.5 text-emerald-700 animate-spin" />
@@ -695,7 +695,7 @@ export default function LocationPicker({
           type="button"
           onClick={handleRecenter}
           title="Recenter New Town view"
-          className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 rounded-md shrink-0 cursor-pointer"
+          className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200/90 rounded-lg shrink-0 cursor-pointer shadow-2xs"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
@@ -788,10 +788,10 @@ export default function LocationPicker({
       </div>
 
       {/* Leaflet Map Canvas with Responsive Height & Touch/Scroll Protection */}
-      <div className="relative rounded-lg overflow-hidden border border-slate-300 shadow-2xs bg-slate-100">
+      <div className="relative rounded-xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100">
         <div
           ref={mapContainerRef}
-          className="w-full h-[250px] sm:h-[280px] z-0 outline-none rounded-lg"
+          className="w-full h-[250px] sm:h-[280px] z-0 outline-none rounded-xl"
           style={{ touchAction: 'none' }}
           tabIndex={0}
         />
@@ -806,7 +806,7 @@ export default function LocationPicker({
       </div>
 
       {/* Coordinate & Landmark Readout Panel */}
-      <div className="bg-slate-50 border border-slate-200 rounded-md p-2.5 space-y-1.5">
+      <div className="bg-slate-50/70 border border-slate-200/90 rounded-xl p-3 space-y-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           {/* Coordinates & Provenance Badge */}
           <div className="flex items-center gap-1.5 flex-wrap">

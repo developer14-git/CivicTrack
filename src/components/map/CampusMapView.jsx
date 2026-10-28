@@ -89,16 +89,16 @@ export default function CampusMapView({
   return (
     <div className="space-y-6 animate-in fade-in duration-200 text-left">
       {/* 1. Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-slate-200/90">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">
               Explore New Town Map
             </h1>
-            <span className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200/90 font-semibold px-2.5 py-0.5 rounded-full">
               Kolkata, WB
             </span>
-            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-medium">
               OpenStreetMap GIS
             </span>
           </div>
@@ -112,7 +112,7 @@ export default function CampusMapView({
             <button
               type="button"
               onClick={onOpenReportModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md transition-colors shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 rounded-lg transition-all shadow-xs hover:shadow-sm cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" aria-hidden="true" />
               <span>Report a Problem</span>
@@ -122,37 +122,37 @@ export default function CampusMapView({
       </div>
 
       {/* 2. Top Summary Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
             Total Reports
           </span>
-          <div className="text-xl font-bold text-slate-900">{issues.length}</div>
-          <span className="text-[11px] text-slate-500">In central database</span>
+          <div className="text-2xl font-extrabold text-slate-900 leading-none">{issues.length}</div>
+          <span className="text-[11px] text-slate-500 mt-1 block">In central database</span>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
             Mapped on GIS
           </span>
-          <div className="text-xl font-bold text-emerald-700">{mappedCount}</div>
-          <span className="text-[11px] text-slate-500">Verified GPS & landmarks</span>
+          <div className="text-2xl font-extrabold text-emerald-700 leading-none">{mappedCount}</div>
+          <span className="text-[11px] text-slate-500 mt-1 block">Verified GPS & landmarks</span>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
             Unmapped Queue
           </span>
-          <div className="text-xl font-bold text-amber-600">{unmappedCount}</div>
-          <span className="text-[11px] text-slate-500">Pending verified coordinates</span>
+          <div className="text-2xl font-extrabold text-amber-600 leading-none">{unmappedCount}</div>
+          <span className="text-[11px] text-slate-500 mt-1 block">Pending coordinates</span>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
             Hotspot Areas
           </span>
-          <div className="text-xl font-bold text-slate-900">{hotspots.length}</div>
-          <span className="text-[11px] text-slate-500">Active municipal clusters</span>
+          <div className="text-2xl font-extrabold text-slate-900 leading-none">{hotspots.length}</div>
+          <span className="text-[11px] text-slate-500 mt-1 block">Active civic clusters</span>
         </div>
       </div>
 
@@ -167,7 +167,7 @@ export default function CampusMapView({
               <select
                 value={selectedCampus || 'All Action Areas'}
                 onChange={(e) => onSelectCampus?.(e.target.value)}
-                className="bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-800 font-medium focus:ring-1 focus:ring-emerald-600"
+                className="bg-white border border-slate-200/90 rounded-lg px-2.5 py-1 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 cursor-pointer shadow-2xs"
               >
                 {NEW_TOWN_AREAS.map((area) => (
                   <option key={area} value={area}>
@@ -178,38 +178,41 @@ export default function CampusMapView({
             </div>
 
             {selectedHotspotId && (
-              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-900 px-2.5 py-1 rounded-full text-xs">
+              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/90 text-amber-900 px-3 py-1 rounded-full text-xs shadow-2xs">
                 <span>Focused: <strong>{activeHotspot?.name}</strong></span>
                 <button
                   type="button"
                   onClick={() => setSelectedHotspotId(null)}
                   className="text-amber-700 hover:text-amber-950 ml-1 font-bold cursor-pointer"
+                  aria-label="Clear focus"
                 >
-                  <X className="w-3 h-3 inline" />
+                  <X className="w-3.5 h-3.5 inline" />
                 </button>
               </div>
             )}
           </div>
 
           {/* Interactive Geographic Map Canvas */}
-          <GeographicMap
-            issues={issues}
-            onOpenIssueDetail={onOpenIssueDetail}
-            height="580px"
-            highlightedIssueId={hoveredIssueId || selectedIssueId}
-            onSelectIssue={(issue) => setSelectedIssueId(issue.id)}
-            externalFilter={activeHotspot?.landmarkName || (selectedCampus && selectedCampus !== 'All Action Areas' ? selectedCampus : null)}
-            onResetExternalFilter={() => {
-              setSelectedHotspotId(null);
-              onSelectCampus?.('All Action Areas');
-            }}
-            onMapReady={(api) => {
-              mapApiRef.current = api;
-            }}
-          />
+          <div className="rounded-xl overflow-hidden border border-slate-200/90 shadow-2xs">
+            <GeographicMap
+              issues={issues}
+              onOpenIssueDetail={onOpenIssueDetail}
+              height="580px"
+              highlightedIssueId={hoveredIssueId || selectedIssueId}
+              onSelectIssue={(issue) => setSelectedIssueId(issue.id)}
+              externalFilter={activeHotspot?.landmarkName || (selectedCampus && selectedCampus !== 'All Action Areas' ? selectedCampus : null)}
+              onResetExternalFilter={() => {
+                setSelectedHotspotId(null);
+                onSelectCampus?.('All Action Areas');
+              }}
+              onMapReady={(api) => {
+                mapApiRef.current = api;
+              }}
+            />
+          </div>
 
           {/* Map Attribution and Honesty Disclaimer */}
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl text-xs text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
             <div className="flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               <span>
@@ -225,13 +228,15 @@ export default function CampusMapView({
         {/* Right Column: Hotspots & Selected Reports Panel (4 cols on lg) */}
         <div className="lg:col-span-4 space-y-4">
           {/* A: Hotspot Summary ("Areas needing attention") */}
-          <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-amber-500" />
+                <div className="w-6 h-6 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <Flame className="w-3.5 h-3.5" />
+                </div>
                 <h2 className="text-sm font-bold text-slate-900">Areas Needing Attention</h2>
               </div>
-              <span className="text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 px-2 py-0.5 rounded-full">
                 Hotspots
               </span>
             </div>
@@ -241,7 +246,7 @@ export default function CampusMapView({
             </p>
 
             {/* Hotspot Cards List */}
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
               {hotspots.map((hotspot) => {
                 const isSelected = selectedHotspotId === hotspot.id;
                 return (
@@ -249,10 +254,10 @@ export default function CampusMapView({
                     key={hotspot.id}
                     type="button"
                     onClick={() => handleSelectHotspot(hotspot)}
-                    className={`w-full text-left p-2.5 rounded-lg border transition-all cursor-pointer ${
+                    className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-600/20 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 bg-white'
+                        ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20 shadow-xs'
+                        : 'border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/70 bg-white'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1 mb-1">
@@ -263,26 +268,26 @@ export default function CampusMapView({
                             {hotspot.name}
                           </h4>
                         </div>
-                        <span className="text-[10px] font-medium text-slate-500 pl-5">
+                        <span className="text-[10px] font-medium text-slate-500 pl-5 block mt-0.5">
                           {hotspot.zone}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
                         {hotspot.overdueCount > 0 && (
-                          <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200/80 px-1.5 py-0.5 rounded-md">
                             {hotspot.overdueCount} Overdue
                           </span>
                         )}
-                        <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded-md">
                           {hotspot.openCount} Open
                         </span>
                       </div>
                     </div>
 
-                    <div className="pl-5 pt-1 flex items-center justify-between text-[11px] text-slate-600">
+                    <div className="pl-5 pt-1.5 flex items-center justify-between text-[11px] text-slate-600 border-t border-slate-100/80 mt-1.5">
                       <span className="text-slate-400">Top issue:</span>
-                      <span className="font-medium text-slate-800 truncate max-w-[150px]">
+                      <span className="font-semibold text-slate-800 truncate max-w-[150px]">
                         {hotspot.topCategory}
                       </span>
                     </div>
@@ -297,8 +302,8 @@ export default function CampusMapView({
           </div>
 
           {/* B: Reports in Selected Area / Active View */}
-          <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
               <div>
                 <h3 className="text-xs font-bold text-slate-900">
                   {activeHotspot ? `Reports in ${activeHotspot.name}` : 'Mapped Reports in Active Area'}
@@ -312,16 +317,16 @@ export default function CampusMapView({
                 <button
                   type="button"
                   onClick={() => setSelectedHotspotId(null)}
-                  className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+                  className="text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer"
                 >
                   Clear focus
                 </button>
               )}
             </div>
 
-            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
               {sideListIssues.length === 0 ? (
-                <div className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded">
+                <div className="p-6 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
                   No reports match the current filter.
                 </div>
               ) : (
@@ -334,40 +339,40 @@ export default function CampusMapView({
                       key={issue.id}
                       onMouseEnter={() => setHoveredIssueId(issue.id)}
                       onMouseLeave={() => setHoveredIssueId(null)}
-                      className={`p-2.5 rounded-lg border transition-colors text-left ${
+                      className={`p-3 rounded-xl border transition-all text-left ${
                         isHovered
-                          ? 'border-emerald-300 bg-emerald-50/30'
-                          : 'border-slate-200 bg-slate-50/50 hover:bg-white'
+                          ? 'border-emerald-300 bg-emerald-50/40 shadow-xs'
+                          : 'border-slate-200/80 bg-slate-50/50 hover:bg-white'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className="font-mono text-[11px] font-bold text-slate-700">
-                          {issue.id}
+                      <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                        <span className="font-mono text-[10px] font-bold text-slate-600 bg-white border border-slate-200/80 px-1.5 py-0.5 rounded">
+                          #{issue.id}
                         </span>
                         <div className="flex items-center gap-1">
-                          {issue.priority && <PriorityBadge priority={issue.priority} size="sm" />}
+                          {issue.priority && <PriorityBadge priority={issue.priority} size="xs" />}
                           {deadline.isOverdue && (
-                            <span className="text-[9px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-1 rounded flex items-center gap-0.5">
+                            <span className="text-[9px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-1 rounded flex items-center gap-0.5">
                               <AlertTriangle className="w-2.5 h-2.5" /> Overdue
                             </span>
                           )}
-                          <StatusBadge status={issue.status} size="sm" />
+                          <StatusBadge status={issue.status} size="xs" />
                         </div>
-
                       </div>
 
                       <h4 className="text-xs font-semibold text-slate-900 leading-snug line-clamp-2 mb-1">
                         {issue.title}
                       </h4>
 
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                        <span className="truncate max-w-[150px]">
-                          {issue.location || issue.building || 'New Town, Kolkata'}
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5 border-t border-slate-100">
+                        <span className="truncate max-w-[150px] flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{issue.location || issue.building || 'New Town, Kolkata'}</span>
                         </span>
                         <button
                           type="button"
                           onClick={() => onOpenIssueDetail(issue.id)}
-                          className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-0.5 cursor-pointer ml-2 shrink-0"
+                          className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 cursor-pointer ml-2 shrink-0 transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Inspect</span>

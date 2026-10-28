@@ -102,9 +102,10 @@ export function createCustomMarkerIcon(issue, isSelected = false) {
   const scale = isSelected ? 1.2 : 1;
   const pinWidth = Math.round(28 * scale);
   const pinHeight = Math.round(36 * scale);
+  const tooltipText = `${issue.id || 'CT-Report'}: ${issue.title || 'Civic Issue'} (${statusConfig.label})`;
 
   const html = `
-    <div class="relative group cursor-pointer" style="transform: translate(-50%, -100%);">
+    <div class="relative group cursor-pointer" style="transform: translate(-50%, -100%);" title="${escapeHtml(tooltipText)}">
       <div class="transition-transform duration-200 ${isSelected ? 'scale-110 drop-shadow-xl' : 'hover:scale-105 drop-shadow-md'}">
         <svg width="${pinWidth}" height="${pinHeight}" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">
           <!-- Pin body -->
@@ -134,7 +135,7 @@ export function createCustomMarkerIcon(issue, isSelected = false) {
 }
 
 /**
- * Creates cluster icon showing total number of grouped issues
+ * Creates cluster icon showing total number of grouped issues with dominant status ring
  */
 export function createClusterIcon(count, issues = []) {
   // Determine dominant status in cluster
@@ -144,15 +145,18 @@ export function createClusterIcon(count, issues = []) {
     (i) => i.status === 'Resolution Submitted' || i.status === 'Awaiting Verification'
   );
 
-  let ringColor = 'rgba(245, 158, 11, 0.4)'; // amber default
-  if (!hasOpen && hasInProgress) ringColor = 'rgba(2, 132, 199, 0.4)';
-  if (!hasOpen && !hasInProgress && hasVerification) ringColor = 'rgba(147, 51, 234, 0.4)';
-  if (!hasOpen && !hasInProgress && !hasVerification) ringColor = 'rgba(16, 185, 129, 0.4)';
+  let ringColor = 'rgba(245, 158, 11, 0.45)'; // amber default for Open
+  if (!hasOpen && hasInProgress) ringColor = 'rgba(2, 132, 199, 0.45)'; // sky for In Progress
+  if (!hasOpen && !hasInProgress && hasVerification) ringColor = 'rgba(147, 51, 234, 0.45)'; // purple for Verification
+  if (!hasOpen && !hasInProgress && !hasVerification) ringColor = 'rgba(16, 185, 129, 0.45)'; // emerald for Resolved
+
+  // Visual hierarchy sizing: small (2-9), medium (10-24), large (25+)
+  const sizeClass = count >= 25 ? 'w-10 h-10 text-sm' : count >= 10 ? 'w-9 h-9 text-xs' : 'w-8 h-8 text-xs';
 
   const html = `
-    <div style="transform: translate(-50%, -50%);" class="group cursor-pointer">
-      <div class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs shadow-md border-2 border-white transition-transform group-hover:scale-110"
-           style="box-shadow: 0 0 0 4px ${ringColor};">
+    <div style="transform: translate(-50%, -50%);" class="group cursor-pointer" title="${count} demonstration reports — Click to expand cluster">
+      <div class="flex items-center justify-center ${sizeClass} rounded-full bg-slate-900 text-white font-bold shadow-md border-2 border-white transition-all duration-200 group-hover:scale-110 active:scale-95"
+           style="box-shadow: 0 0 0 4px ${ringColor}, 0 2px 8px rgba(0,0,0,0.22);">
         ${count}
       </div>
     </div>
@@ -164,6 +168,162 @@ export function createClusterIcon(count, issues = []) {
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });
+}
+
+/**
+ * Returns cluster pixel distance threshold for a given zoom level.
+ * Calibrated for New Town, Kolkata spatial bounds to ensure healthy distribution:
+ * - Zoom >= 16: 0px (all individual pins visible and clickable)
+ * - Zoom 15: 8px (separates individual street segments and blocks)
+ * - Zoom 14: 14px (separates sub-neighborhoods)
+ * - Zoom 13: 18px (default zoom: displays ~32-35 distinct landmarks/clusters across Action Areas I, II, III without overgrown clusters)
+ * - Zoom 12: 22px (balanced township overview with ~18-20 clusters)
+ * - Zoom <= 11: 28px (regional high-level summary)
+ */
+export function getClusterThreshold(zoom) {
+  if (zoom >= 16) return 0;
+  if (zoom === 15) return 8;
+  if (zoom === 14) return 14;
+  if (zoom === 13) return 18;
+  if (zoom === 12) return 22;
+  return 28;
+}
+
+/**
+ * Filters mapped issues according to active user search and filter criteria.
+ */
+export function filterMappedIssues(
+  mappedIssues = [],
+  {
+    searchQuery = '',
+    externalFilter = null,
+    categoryFilter = 'All',
+    statusFilter = 'ALL',
+    priorityFilter = 'ALL',
+    unresolvedOnly = false,
+  } = {}
+) {
+  return mappedIssues.filter(({ issue }) => {
+    // Search query matching ID, title, location, building, category, neighbourhood
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchesQuery =
+        (issue.id && issue.id.toLowerCase().includes(q)) ||
+        (issue.title && issue.title.toLowerCase().includes(q)) ||
+        (issue.location && issue.location.toLowerCase().includes(q)) ||
+        (issue.building && issue.building.toLowerCase().includes(q)) ||
+        (issue.category && issue.category.toLowerCase().includes(q)) ||
+        (issue.neighbourhood && issue.neighbourhood.toLowerCase().includes(q));
+      if (!matchesQuery) return false;
+    }
+
+    // External filter (e.g. Action Area or Hotspot landmark)
+    if (externalFilter && externalFilter !== 'ALL' && externalFilter !== 'All Action Areas') {
+      const ext = externalFilter.toLowerCase();
+      const loc = (issue.location || '').toLowerCase();
+      const bldg = (issue.building || '').toLowerCase();
+      const area = (issue.area || '').toLowerCase();
+      const campus = (issue.campus || '').toLowerCase();
+      if (!loc.includes(ext) && !bldg.includes(ext) && !area.includes(ext) && !campus.includes(ext)) {
+        return false;
+      }
+    }
+
+    // Category filter
+    if (categoryFilter && categoryFilter !== 'All' && issue.category !== categoryFilter) {
+      return false;
+    }
+
+    // Status filter
+    if (statusFilter && statusFilter !== 'ALL') {
+      if (statusFilter === 'Awaiting Verification') {
+        if (issue.status !== 'Resolution Submitted' && issue.status !== 'Awaiting Verification') {
+          return false;
+        }
+      } else if (issue.status !== statusFilter) {
+        return false;
+      }
+    }
+
+    // Priority filter
+    if (priorityFilter && priorityFilter !== 'ALL' && issue.priority !== priorityFilter) {
+      return false;
+    }
+
+    // Unresolved only
+    if (unresolvedOnly && issue.status === 'Resolved') {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Clusters visible mapped issues spatially using the provided projection function.
+ * Returns array of cluster objects:
+ * { isCluster: false, item: { issue, lat, lng, isExact, source } } or
+ * { isCluster: true, items: [...], lat, lng, count }
+ */
+export function clusterMappedIssues(visibleMappedIssues = [], zoom = 13, projectFn = null) {
+  if (!visibleMappedIssues || visibleMappedIssues.length === 0) return [];
+
+  const threshold = getClusterThreshold(zoom);
+  const clusters = [];
+  const visited = new Set();
+
+  // If no projection function provided (e.g. in test environment without DOM Leaflet),
+  // use standard Web Mercator spherical projection
+  const toPoint = projectFn || ((lat, lng) => {
+    const siny = Math.min(Math.max(Math.sin((lat * Math.PI) / 180), -0.9999), 0.9999);
+    return {
+      x: 256 * Math.pow(2, zoom) * (0.5 + lng / 360),
+      y: 256 * Math.pow(2, zoom) * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)),
+    };
+  });
+
+  const projectedPoints = visibleMappedIssues.map((m) => toPoint(m.lat, m.lng));
+
+  for (let i = 0; i < visibleMappedIssues.length; i++) {
+    if (visited.has(i)) continue;
+    visited.add(i);
+
+    const p1 = visibleMappedIssues[i];
+    const pt1 = projectedPoints[i];
+    const clusterItems = [p1];
+
+    if (threshold > 0) {
+      for (let j = i + 1; j < visibleMappedIssues.length; j++) {
+        if (visited.has(j)) continue;
+        const pt2 = projectedPoints[j];
+        const dist = Math.hypot(pt1.x - pt2.x, pt1.y - pt2.y);
+
+        if (dist < threshold) {
+          visited.add(j);
+          clusterItems.push(visibleMappedIssues[j]);
+        }
+      }
+    }
+
+    if (clusterItems.length === 1) {
+      clusters.push({
+        isCluster: false,
+        item: clusterItems[0],
+      });
+    } else {
+      const avgLat = clusterItems.reduce((acc, c) => acc + c.lat, 0) / clusterItems.length;
+      const avgLng = clusterItems.reduce((acc, c) => acc + c.lng, 0) / clusterItems.length;
+      clusters.push({
+        isCluster: true,
+        items: clusterItems,
+        lat: avgLat,
+        lng: avgLng,
+        count: clusterItems.length,
+      });
+    }
+  }
+
+  return clusters;
 }
 
 /**
